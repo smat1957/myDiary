@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific files
+xcuserdata/
+*.xcuserstate
+
+# Build products
+build/
+DerivedData/
+
+# Swift Package Manager build cache
+.build/
+
+# Xcode temporary files
+*.xccheckout
+*.xcscmblueprint
