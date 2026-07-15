@@ -8,13 +8,23 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+private enum FolderSelectionPurpose {
+    case importPackage
+    case exportPackage
+}
+
 struct ContentView: View {
 
     @State private var vm = TimelineViewModel()
     @State private var showingEditor = false
     @State private var editingPost: DiaryPost?
-    @State private var showingImporter = false
+    //@State private var showingImporter = false
     @State private var importMessage: String?
+    //@State private var showingExporter = false
+    @State private var exportMessage: String?
+    @State private var showingFolderSelector = false
+    @State private var folderSelectionPurpose: FolderSelectionPurpose?
+    @State private var replyParentPost: DiaryPost?
     
     var body: some View {
         NavigationStack {
@@ -39,6 +49,14 @@ struct ContentView: View {
                 },
 
                 onCreateLink: { sourcePost, targetPost in
+
+                    //print(
+                    //    "ContentView onCreateLink:",
+                    //    sourcePost.id,
+                    //    "->",
+                    //    targetPost.id
+                    //)
+
                     vm.addLink(
                         from: sourcePost,
                         to: targetPost
@@ -51,6 +69,7 @@ struct ContentView: View {
                         from: sourcePostID
                     )
                 },
+
                 onDeleteLink: { sourcePost, targetPostID in
                     vm.removeLink(
                         from: sourcePost,
@@ -65,9 +84,22 @@ struct ContentView: View {
                         to: destinationIndex
                     )
                 },
-                
-                backlinkDictionary: vm.backlinkDictionary
 
+                backlinkDictionary: vm.backlinkDictionary,
+
+                onLinkComment: { comment, parent in
+                    vm.linkComment(
+                        comment,
+                        to: parent
+                    )
+                },
+                onUnlinkComment: { comment in
+                    vm.unlinkComment(comment)
+                },
+                
+                onReplyPost: { parentPost in
+                    replyParentPost = parentPost
+                }
             )
             .navigationTitle("Diary")
             .toolbar {
@@ -82,18 +114,27 @@ struct ContentView: View {
 
                 ToolbarItemGroup(placement: .primaryAction) {
                     Button {
-                        showingImporter = true
+                        folderSelectionPurpose = .importPackage
+                        showingFolderSelector = true
                     } label: {
                         Image(systemName: "square.and.arrow.down")
                     }
-                    .help("JSONを読み込む")
-
+                    .help("Diary Packageを読み込む")
+                    
                     Button {
                         showingEditor = true
                     } label: {
                         Image(systemName: "plus")
                     }
                     .help("新しい投稿")
+                    
+                    Button {
+                        folderSelectionPurpose = .exportPackage
+                        showingFolderSelector = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .help("Diary Packageを書き出す")
                 }
             }
             .sheet(isPresented: $showingEditor) {
@@ -108,58 +149,74 @@ struct ContentView: View {
                     editingPost: post
                 )
             }
+            .sheet(item: $replyParentPost) { parentPost in
+                PostEditorView(
+                    vm: vm,
+                    editingPost: nil,
+                    parentPost: parentPost
+                )
+            }
+            .sheet(item: $replyParentPost) { parentPost in
+                PostEditorView(
+                    vm: vm,
+                    editingPost: nil,
+                    parentPost: parentPost
+                )
+            }
         }
-
         .fileImporter(
-            isPresented: $showingImporter,
+            isPresented: $showingFolderSelector,
             allowedContentTypes: [.folder],
             allowsMultipleSelection: false
         ) { result in
+
+            guard
+                let purpose = folderSelectionPurpose
+            else {
+                return
+            }
+
+            folderSelectionPurpose = nil
+
             switch result {
+
             case .success(let urls):
-                guard let packageURL = urls.first else {
+
+                guard let selectedFolder = urls.first else {
                     return
                 }
 
-                Task {
-                    do {
-                        let importer = DiaryImporter()
+                switch purpose {
 
-                        let importResult = try await importer.importPackage(
-                            from: packageURL
-                        )
+                case .importPackage:
+                    importPackage(
+                        from: selectedFolder
+                    )
 
-                        await MainActor.run {
-                            vm.loadPosts()
-
-                            importMessage = """
-                            Diary Packageの読み込みが完了しました。
-
-                            新規投稿: \(importResult.importedPostCount)件
-                            既存投稿: \(importResult.skippedPostCount)件
-                            メディア: \(importResult.importedMediaCount)件
-                            投稿リンク: \(importResult.importedLinkCount)件
-                            メディアスキップ: \(importResult.skippedMediaCount)件
-                            """
-                        }
-
-                    } catch {
-                        await MainActor.run {
-                            importMessage = """
-                            Diary Packageの読み込みに失敗しました。
-
-                            \(error.localizedDescription)
-                            """
-                        }
-                    }
+                case .exportPackage:
+                    exportPackage(
+                        to: selectedFolder
+                    )
                 }
-                
-            case .failure(let error):
-                importMessage = """
-                フォルダ選択に失敗しました。
 
-                \(error.localizedDescription)
-                """
+            case .failure(let error):
+
+                switch purpose {
+
+                case .importPackage:
+                    importMessage = """
+                    フォルダ選択に失敗しました。
+
+                    \(error.localizedDescription)
+                    """
+
+                case .exportPackage:
+                    exportMessage = """
+                    書き出し先フォルダの選択に失敗しました。
+
+                    \(error.localizedDescription)
+                    """
+                }
             }
         }
         .alert(
@@ -174,6 +231,113 @@ struct ContentView: View {
             }
         } message: {
             Text(importMessage ?? "")
+        }
+        .alert(
+            "エクスポート",
+            isPresented: Binding(
+                get: {
+                    exportMessage != nil
+                },
+                set: {
+                    if !$0 {
+                        exportMessage = nil
+                    }
+                }
+            )
+        ) {
+            Button("OK") {
+                exportMessage = nil
+            }
+        } message: {
+            Text(exportMessage ?? "")
+        }
+    }
+    
+    private func importPackage(
+        from packageURL: URL
+    ) {
+
+        Task {
+            do {
+                let importer = DiaryImporter()
+
+                let importResult =
+                    try await importer.importPackage(
+                        from: packageURL
+                    )
+
+                await MainActor.run {
+
+                    vm.loadPosts()
+
+                    importMessage = """
+                    Diary Packageの読み込みが完了しました。
+
+                    新規投稿: \(importResult.importedPostCount)件
+                    既存投稿: \(importResult.skippedPostCount)件
+                    メディア: \(importResult.importedMediaCount)件
+                    投稿リンク: \(importResult.importedLinkCount)件
+                    メディアスキップ: \(importResult.skippedMediaCount)件
+                    """
+                }
+
+            } catch {
+
+                await MainActor.run {
+
+                    importMessage = """
+                    Diary Packageの読み込みに失敗しました。
+
+                    \(error.localizedDescription)
+                    """
+                }
+            }
+        }
+    }
+    
+    private func exportPackage(
+        to selectedFolder: URL
+    ) {
+
+        let accessing =
+            selectedFolder
+                .startAccessingSecurityScopedResource()
+
+        defer {
+            if accessing {
+                selectedFolder
+                    .stopAccessingSecurityScopedResource()
+            }
+        }
+
+        do {
+            let exporter = DiaryExporter()
+
+            let exportResult =
+                try exporter.exportPackage(
+                    posts: vm.posts,
+                    title: "myDiary Export",
+                    to: selectedFolder
+                )
+
+            exportMessage = """
+            Diary Packageの書き出しが完了しました。
+
+            投稿: \(exportResult.exportedPostCount)件
+            メディア: \(exportResult.exportedMediaCount)件
+            投稿リンク: \(exportResult.exportedLinkCount)件
+
+            保存先:
+            \(exportResult.outputURL.path)
+            """
+
+        } catch {
+
+            exportMessage = """
+            Diary Packageの書き出しに失敗しました。
+
+            \(error.localizedDescription)
+            """
         }
     }
 }

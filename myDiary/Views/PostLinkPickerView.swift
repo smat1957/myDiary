@@ -47,6 +47,14 @@ struct PostLinkPickerView: View {
 
                 List(filteredPosts) { post in
                     Button {
+                        
+                        //print(
+                        //    "PostLinkPickerView 選択:",
+                        //    sourcePost.id,
+                        //    "->",
+                        //    post.id
+                        //)
+
                         onSelect(post)
                         dismiss()
                     } label: {

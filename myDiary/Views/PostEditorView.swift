@@ -17,7 +17,9 @@ struct PostEditorView: View {
     
     @Environment(\.dismiss)
     private var dismiss
-
+    
+    let parentPost: DiaryPost?
+    
     @State private var bodyText = ""
     @State private var selectedImages: [DiaryImage] = []
     @State private var showingImagePicker = false
@@ -27,11 +29,14 @@ struct PostEditorView: View {
     
     init(
         vm: TimelineViewModel,
-        editingPost: DiaryPost? = nil
+        editingPost: DiaryPost? = nil,
+        parentPost: DiaryPost? = nil
     ) {
         self.vm = vm
         self.editingPost = editingPost
-
+        
+        self.parentPost = parentPost
+        
         let images = editingPost?.images ?? []
 
         _bodyText = State(
@@ -163,6 +168,7 @@ struct PostEditorView: View {
                             let post = DiaryPost(
                                 body: bodyText,
                                 createdAt: Date(),
+                                parentPostId: parentPost?.id,
                                 images: selectedImages
                             )
                             vm.addPost(post)

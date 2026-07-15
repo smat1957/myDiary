@@ -15,7 +15,49 @@ final class PostRepository {
     init(dbQueue: DatabaseQueue = DatabaseManager.shared.dbQueue) {
         self.dbQueue = dbQueue
     }
+    /*
+    func debugPostLinks() {
+        do {
+            try dbQueue.read { db in
 
+                let count = try Int.fetchOne(
+                    db,
+                    sql: """
+                    SELECT COUNT(*)
+                    FROM post_links
+                    """
+                ) ?? 0
+
+                print(
+                    "DB post_links件数:",
+                    count
+                )
+
+                let records = try PostLinkRecord
+                    .order(Column("id"))
+                    .fetchAll(db)
+
+                for record in records {
+                    print(
+                        "DB LINK:",
+                        record.id ?? 0,
+                        record.fromPostId,
+                        "->",
+                        record.toPostId,
+                        "sort:",
+                        record.sortOrder
+                    )
+                }
+            }
+
+        } catch {
+            print(
+                "post_links診断失敗:",
+                error
+            )
+        }
+    }
+    */
     func fetchAll() throws -> [DiaryPost] {
         try dbQueue.read { db in
             let postRecords = try PostRecord
@@ -31,7 +73,14 @@ final class PostRepository {
                     fromPostID: postRecord.id!,
                     db: db
                 )
-                
+                //if !links.isEmpty {
+                //    print(
+                //        "fetchAll link:",
+                //        postRecord.id ?? 0,
+                //        "件数:",
+                //        links.count
+                //    )
+                //}
                 let post = DiaryPost(
                     id: postRecord.id ?? 0,
                     packagePostID: postRecord.packagePostID,
@@ -65,9 +114,13 @@ final class PostRepository {
     func insert(_ post: DiaryPost) throws -> Int64 {
         try dbQueue.write { db in
 
+            let packagePostID =
+                post.packagePostID
+                ?? "mydiary-\(UUID().uuidString.lowercased())"
+
             var postRecord = PostRecord(
                 id: nil,
-                packagePostID: post.packagePostID,
+                packagePostID: packagePostID,
                 body: post.body,
                 diaryDate: post.diaryDate,
                 createdAt: post.createdAt,
@@ -126,7 +179,7 @@ final class PostRepository {
             try ImageRecord
                 .filter(Column("postId") == post.id)
                 .deleteAll(db)
-            
+
             try PostLinkRecord
                 .filter(Column("fromPostId") == post.id)
                 .deleteAll(db)

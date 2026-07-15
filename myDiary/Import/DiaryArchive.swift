@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Root
 
-struct DiaryArchive: Decodable {
+struct DiaryArchive: Codable {
 
     let format: String
     let version: Int
@@ -33,7 +33,7 @@ struct DiaryArchive: Decodable {
 
 // MARK: - Generator
 
-struct DiaryArchiveGenerator: Decodable {
+struct DiaryArchiveGenerator: Codable {
 
     let application: String
     let version: String
@@ -41,7 +41,7 @@ struct DiaryArchiveGenerator: Decodable {
 
 // MARK: - Post
 
-struct DiaryArchivePost: Decodable {
+struct DiaryArchivePost: Codable {
 
     /// Diary Package内で一意のID
     let id: String
@@ -86,21 +86,21 @@ struct DiaryArchivePost: Decodable {
     }
 }
 
-enum DiaryArchivePostType: String, Decodable {
+enum DiaryArchivePostType: String, Codable {
     case post
     case comment
 }
 
 // MARK: - Source
 
-struct DiaryArchiveSource: Decodable {
+struct DiaryArchiveSource: Codable {
 
     let system: String
     let id: String?
 }
 
 // MARK: - Media
-struct DiaryArchiveMedia: Decodable, Identifiable {
+struct DiaryArchiveMedia: Codable, Identifiable {
     
     let id: String
     let type: DiaryArchiveMediaType
@@ -170,7 +170,7 @@ struct DiaryArchiveMedia: Decodable, Identifiable {
 
 }
 
-enum DiaryArchiveMediaType: String, Decodable {
+enum DiaryArchiveMediaType: String, Codable {
     case photo
     case youtube
     case link
@@ -202,7 +202,7 @@ enum DiaryArchiveMediaType: String, Decodable {
 
 // MARK: - Post link
 
-struct DiaryArchivePostLink: Decodable {
+struct DiaryArchivePostLink: Codable {
 
     /// リンク先投稿のDiary Package ID
     let target: String

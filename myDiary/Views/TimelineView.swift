@@ -23,11 +23,18 @@ struct TimelineView: View {
     let onDeleteLink: (DiaryPost, Int64) -> Void
     let onMoveLink: (DiaryPost, Int, Int) -> Void
     let backlinkDictionary: [Int64: [DiaryPost]]
+    let onLinkComment: (
+        DiaryPost,
+        DiaryPost
+    ) -> Void
+    let onUnlinkComment: (DiaryPost) -> Void
+    let onReplyPost: (DiaryPost) -> Void
     
     @State private var viewerState: ImageViewerState?
     @State private var pendingDeletePost: DiaryPost?
     @State private var linkSourcePost: DiaryPost?
-
+    @State private var commentToLink: DiaryPost?
+    
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -38,10 +45,7 @@ struct TimelineView: View {
                         
                         PostCardView(
                             post: post,
-
-                            comments: posts.filter {
-                                $0.parentPostId == post.id
-                            },
+                            posts: posts,
 
                             postDictionary: postDictionary,
                             backlinks: backlinkDictionary[post.id] ?? [],
@@ -65,6 +69,11 @@ struct TimelineView: View {
                             },
                             
                             onLinkPost: { post in
+                                //print(
+                                //    "TimelineView onLinkPost:",
+                                //    post.id
+                                //)
+
                                 linkSourcePost = post
                             },
                             
@@ -90,10 +99,22 @@ struct TimelineView: View {
                                     sourceIndex,
                                     destinationIndex
                                 )
+                            },
+                            
+                            onLinkComment: { comment in
+                                commentToLink = comment
+                            },
+                            onUnlinkComment: { comment in
+                                onUnlinkComment(comment)
+                            },
+                            
+                            onReplyPost: { post in
+                                onReplyPost(post)
                             }
 
                         )
-                        .id(post.id)                    }
+                        .id(post.id)
+                    }
                 }
                 .padding()
             }
@@ -126,7 +147,11 @@ struct TimelineView: View {
             "この投稿を削除しますか？",
             isPresented: Binding(
                 get: { pendingDeletePost != nil },
-                set: { if !$0 { pendingDeletePost = nil } }
+                set: {
+                    if !$0 {
+                        pendingDeletePost = nil
+                    }
+                }
             )
         ) {
             Button("キャンセル", role: .cancel) {
@@ -137,6 +162,7 @@ struct TimelineView: View {
                 if let post = pendingDeletePost {
                     onDeletePost(post)
                 }
+
                 pendingDeletePost = nil
             }
         } message: {
@@ -147,6 +173,13 @@ struct TimelineView: View {
                 posts: posts,
                 sourcePost: sourcePost,
                 onSelect: { targetPost in
+                    //print(
+                    //    "TimelineView onSelect:",
+                    //    sourcePost.id,
+                    //    "->",
+                    //    targetPost.id
+                    //)
+
                     onCreateLink(
                         sourcePost,
                         targetPost
@@ -154,6 +187,19 @@ struct TimelineView: View {
                 }
             )
         }
+        .sheet(item: $commentToLink) { comment in
+            ParentPostPickerView(
+                comment: comment,
+                posts: posts,
+                onSelect: { parent in
+                    onLinkComment(
+                        comment,
+                        parent
+                    )
+                }
+            )
+        }
+        
     }
 
     private func openImage(

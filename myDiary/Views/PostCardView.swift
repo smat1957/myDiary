@@ -10,7 +10,8 @@ import SwiftUI
 struct PostCardView: View {
     
     let post: DiaryPost
-    let comments: [DiaryPost]
+    //let comments: [DiaryPost]
+    let posts: [DiaryPost]
     let postDictionary: [Int64: DiaryPost]
     let backlinks: [DiaryPost]
 
@@ -24,6 +25,9 @@ struct PostCardView: View {
     let onOpenLinkedPost: (Int64) -> Void
     let onDeleteLink: (Int64) -> Void
     let onMoveLink: (Int, Int) -> Void
+    let onLinkComment: (DiaryPost) -> Void
+    let onUnlinkComment: (DiaryPost) -> Void
+    let onReplyPost: (DiaryPost) -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -37,8 +41,28 @@ struct PostCardView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
 
+                Button {
+                    onLinkComment(post)
+                } label: {
+                    Label(
+                        "親投稿に紐付ける",
+                        systemImage: "arrow.turn.down.right"
+                    )
+                }
+
                 Spacer()
-                                
+                
+                Button {
+                    onReplyPost(post)
+                } label: {
+                    Label(
+                        "返信",
+                        systemImage: "arrowshape.turn.up.left"
+                    )
+                }
+                .buttonStyle(.plain)
+                .help("コメントを追加")
+                
                 Button {
                     onOpenViewer(post)
                 } label: {
@@ -46,9 +70,19 @@ struct PostCardView: View {
                 }
 
                 Button {
+                    //print(
+                    //    "PostCardView 関連記事追加:",
+                    //    post.id
+                    //)
+
                     onLinkPost(post)
                 } label: {
-                    Image(systemName: "link")
+                    Label(
+                        "関連記事を追加",
+                        systemImage: "link"
+                    )
+
+                    //Image(systemName: "link")
                 }
                 .buttonStyle(.plain)
                 .help("関連投稿を追加")
@@ -100,7 +134,49 @@ struct PostCardView: View {
             }
             
             PostCommentsView(
-                comments: comments,
+                parentPost: post,
+                posts: posts,
+                onEditPost: { comment in
+                    onEditPost(comment)
+                },
+
+                onOpenViewer: { comment in
+                    onOpenViewer(comment)
+                },
+
+                onLinkPost: { comment in
+                    onLinkPost(comment)
+                },
+                
+                onUnlinkComment: { comment in
+                    onUnlinkComment(comment)
+                },
+
+                onTapImage: { comment, image in
+                    onTapImage(image)
+                },
+
+                onDeleteImage: { comment, image in
+                    onDeleteImage(
+                        comment,
+                        image
+                    )
+                },
+
+                onOpenSource: { image in
+                    onOpenSource(image)
+                },
+                
+                onReplyPost: onReplyPost
+
+            )
+            /*
+            PostCommentsView(
+                parentPost: post,
+                posts: posts,
+                onUnlinkComment: { comment in
+                    onUnlinkComment(comment)
+                },
                 onTapImage: {
                     _,
                     image in
@@ -125,7 +201,9 @@ struct PostCardView: View {
                         image
                     )
                 }
+
             )
+             */
             
         }
         .frame(maxWidth: .infinity, alignment: .leading)

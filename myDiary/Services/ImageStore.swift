@@ -264,6 +264,125 @@ final class ImageStore {
         }
     }
 
+    // MARK: - Export
+
+    struct ExportedImagePaths {
+        let path: String
+        let displayPath: String
+        let thumbnailPath: String
+    }
+
+    func exportImage(
+        _ image: DiaryImage,
+        to packageRoot: URL
+    ) throws -> ExportedImagePaths {
+
+        //let fileManager = FileManager.default
+
+        let sourceOriginalURL = url(
+            for: image,
+            kind: .original
+        )
+
+        let sourceDisplayURL = url(
+            for: image,
+            kind: .display
+        )
+
+        let sourceThumbnailURL = url(
+            for: image,
+            kind: .thumbnail
+        )
+
+        let sourceFolderName =
+            image.sourceType.rawValue
+
+        let relativeOriginalPath =
+            "pictures/\(sourceFolderName)/original/"
+            + image.baseName
+            + "."
+            + image.originalExtension
+
+        let relativeDisplayPath =
+            "pictures/\(sourceFolderName)/display/"
+            + image.baseName
+            + ".jpg"
+
+        let relativeThumbnailPath =
+            "pictures/\(sourceFolderName)/thumbnail/"
+            + image.baseName
+            + ".jpg"
+
+        let destinationOriginalURL =
+            packageRoot.appendingPathComponent(
+                relativeOriginalPath
+            )
+
+        let destinationDisplayURL =
+            packageRoot.appendingPathComponent(
+                relativeDisplayPath
+            )
+
+        let destinationThumbnailURL =
+            packageRoot.appendingPathComponent(
+                relativeThumbnailPath
+            )
+
+        try ensureParentDirectory(
+            of: destinationOriginalURL
+        )
+
+        try ensureParentDirectory(
+            of: destinationDisplayURL
+        )
+
+        try ensureParentDirectory(
+            of: destinationThumbnailURL
+        )
+
+        try copyReplacingExisting(
+            from: sourceOriginalURL,
+            to: destinationOriginalURL
+        )
+
+        try copyReplacingExisting(
+            from: sourceDisplayURL,
+            to: destinationDisplayURL
+        )
+
+        try copyReplacingExisting(
+            from: sourceThumbnailURL,
+            to: destinationThumbnailURL
+        )
+
+        return ExportedImagePaths(
+            path: relativeOriginalPath,
+            displayPath: relativeDisplayPath,
+            thumbnailPath: relativeThumbnailPath
+        )
+    }
+
+    private func copyReplacingExisting(
+        from sourceURL: URL,
+        to destinationURL: URL
+    ) throws {
+
+        let fileManager = FileManager.default
+
+        if fileManager.fileExists(
+            atPath: destinationURL.path
+        ) {
+            try fileManager.removeItem(
+                at: destinationURL
+            )
+        }
+
+        try fileManager.copyItem(
+            at: sourceURL,
+            to: destinationURL
+        )
+    }
+    
     // MARK: - Utilities
 
     private func makeBaseName(date: Date) -> String {

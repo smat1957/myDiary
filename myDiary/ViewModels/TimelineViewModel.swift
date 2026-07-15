@@ -32,7 +32,8 @@ final class TimelineViewModel {
             $0.parentPostId == nil
         }
     }
-
+    
+    // MARK: - Comment relationship
     /// 指定した投稿に紐付くコメントを返す。
     func comments(
         for post: DiaryPost
@@ -54,7 +55,58 @@ final class TimelineViewModel {
                 return $0.id < $1.id
             }
     }
+    
+    func linkComment(
+        _ comment: DiaryPost,
+        to parent: DiaryPost
+    ) {
+        guard comment.id != parent.id else {
+            return
+        }
 
+        do {
+            var updatedComment = comment
+
+            updatedComment.parentPostId = parent.id
+            updatedComment.updatedAt = Date()
+
+            try repository.update(
+                updatedComment
+            )
+
+            loadPosts()
+
+        } catch {
+            print(
+                "コメントの親投稿設定失敗:",
+                error.localizedDescription
+            )
+        }
+    }
+    
+    func unlinkComment(
+        _ comment: DiaryPost
+    ) {
+        do {
+            var updatedComment = comment
+
+            updatedComment.parentPostId = nil
+            updatedComment.updatedAt = Date()
+
+            try repository.update(
+                updatedComment
+            )
+
+            loadPosts()
+
+        } catch {
+            print(
+                "コメントの親投稿解除失敗:",
+                error.localizedDescription
+            )
+        }
+    }
+    
     // MARK: - Post lookup
 
     var postDictionary: [Int64: DiaryPost] {
@@ -126,6 +178,7 @@ final class TimelineViewModel {
             )
         }
         */
+        //repository.debugPostLinks()
     }
 
     // MARK: - Post operations
@@ -190,7 +243,7 @@ final class TimelineViewModel {
     }
 
     // MARK: - Post links
-
+    
     func addLink(
         from source: DiaryPost,
         to target: DiaryPost
@@ -212,6 +265,44 @@ final class TimelineViewModel {
             )
         )
 
+        //print(
+        //    "リンク追加:",
+        //    source.id,
+        //    "->",
+        //    target.id,
+        //    "件数:",
+        //    updated.links.count
+        //)
+
+        updatePost(updated)
+        jumpToPost(target.id, from: source.id)
+    }
+    
+    /*
+    func addLink(
+        from source: DiaryPost,
+        to target: DiaryPost
+    ) {
+        var updated = source
+
+        guard !updated.links.contains(where: {
+            $0.toPostId == target.id
+        }) else {
+            jumpToPost(
+                target.id,
+                from: source.id
+            )
+            return
+        }
+
+        updated.links.append(
+            PostLink(
+                fromPostId: source.id,
+                toPostId: target.id,
+                sortOrder: updated.links.count
+            )
+        )
+
         print(
             "リンク追加:",
             source.id,
@@ -222,9 +313,16 @@ final class TimelineViewModel {
         )
 
         updatePost(updated)
-        jumpToPost(target.id, from: source.id)
-    }
 
+        // ★追加
+        repository.debugPostLinks()
+
+        jumpToPost(
+            target.id,
+            from: source.id
+        )
+    }
+    */
     func openLinkedPost(
         _ targetPostID: Int64,
         from sourcePostID: Int64

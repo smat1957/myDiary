@@ -11,7 +11,8 @@ import AppKit
 struct ImageGridView: View {
 
     let images: [DiaryImage]
-
+    var scale: CGFloat = 1.0
+    
     let onTapImage: (DiaryImage) -> Void
     let onDelete: (DiaryImage) -> Void
     let onOpenSource: (DiaryImage) -> Void
@@ -75,7 +76,10 @@ struct ImageGridView: View {
 
     // MARK: - Grid height
 
+    // MARK: - Grid height
+
     private var gridHeight: CGFloat {
+
         let titleHeight: CGFloat = 28
         let titleSpacing: CGFloat = 8
 
@@ -87,38 +91,37 @@ struct ImageGridView: View {
         case 1:
             return titleHeight
                 + titleSpacing
-                + 320
+                + 320 * scale
 
         case 2:
             return titleHeight
                 + titleSpacing
-                + 260
+                + 260 * scale
 
         case 3:
             return titleHeight
                 + titleSpacing
-                + 220
+                + 220 * scale
                 + spacing
-                + 180
+                + 180 * scale
 
         case 4:
             return titleHeight
                 + titleSpacing
-                + 180
+                + 180 * scale
                 + spacing
-                + 180
+                + 180 * scale
 
         default:
             return titleHeight
                 + titleSpacing
-                + 180
+                + 180 * scale
                 + spacing
-                + 180
+                + 180 * scale
         }
     }
-
+    
     // MARK: - Layouts
-
     private func singleImage(
         _ image: DiaryImage,
         width: CGFloat
@@ -127,10 +130,22 @@ struct ImageGridView: View {
         mediaCell(
             image,
             width: width,
-            height: 320
+            height: 320 * scale
         )
     }
+    /*
+    private func singleImage(
+        _ image: DiaryImage,
+        width: CGFloat
+    ) -> some View {
 
+        mediaCell(
+            image,
+            width: width,
+            height: 320 * scale
+        )
+    }
+    */
     private func twoImages(
         _ image1: DiaryImage,
         _ image2: DiaryImage,
@@ -147,22 +162,55 @@ struct ImageGridView: View {
             mediaCell(
                 image1,
                 width: cellWidth,
-                height: 260
+                height: 260 * scale
             )
 
             mediaCell(
                 image2,
                 width: cellWidth,
-                height: 260
+                height: 260 * scale
             )
         }
         .frame(
             width: width,
-            height: 260,
+            height: 260 * scale,
+            alignment: .leading
+        )
+        .clipped()
+    }
+    /*
+    private func twoImages(
+        _ image1: DiaryImage,
+        _ image2: DiaryImage,
+        width: CGFloat
+    ) -> some View {
+
+        let cellWidth = max(
+            0,
+            (width - spacing) / 2
+        )
+
+        return HStack(spacing: spacing) {
+
+            mediaCell(
+                image1,
+                width: cellWidth,
+                height: 260 * scale
+            )
+
+            mediaCell(
+                image2,
+                width: cellWidth,
+                height: 260 * scale
+            )
+        }
+        .frame(
+            width: width,
+            height: 260 * scale,
             alignment: .leading
         )
     }
-
+*/
     private func threeImages(
         _ image1: DiaryImage,
         _ image2: DiaryImage,
@@ -180,7 +228,7 @@ struct ImageGridView: View {
             mediaCell(
                 image1,
                 width: width,
-                height: 220
+                height: 220 * scale
             )
 
             HStack(spacing: spacing) {
@@ -188,18 +236,18 @@ struct ImageGridView: View {
                 mediaCell(
                     image2,
                     width: cellWidth,
-                    height: 180
+                    height: 180 * scale
                 )
 
                 mediaCell(
                     image3,
                     width: cellWidth,
-                    height: 180
+                    height: 180 * scale
                 )
             }
             .frame(
                 width: width,
-                height: 180,
+                height: 180 * scale,
                 alignment: .leading
             )
         }
@@ -207,8 +255,56 @@ struct ImageGridView: View {
             width: width,
             alignment: .leading
         )
+        .clipped()
     }
+    /*
+    private func threeImages(
+        _ image1: DiaryImage,
+        _ image2: DiaryImage,
+        _ image3: DiaryImage,
+        width: CGFloat
+    ) -> some View {
 
+        let cellWidth = max(
+            0,
+            (width - spacing) / 2
+        )
+
+        return VStack(spacing: spacing) {
+
+            mediaCell(
+                image1,
+                width: width,
+                height: 220 * scale
+            )
+
+            HStack(spacing: spacing) {
+
+                mediaCell(
+                    image2,
+                    width: cellWidth,
+                    height: 180 * scale
+                )
+
+                mediaCell(
+                    image3,
+                    width: cellWidth,
+                    height: 180 * scale
+                )
+            }
+            .frame(
+                width: width,
+                height: 180 * scale,
+                alignment: .leading
+            )
+        }
+        .frame(
+            width: width,
+            height: 180 * scale,
+            alignment: .leading
+        )
+    }
+*/
     private func fourImages(
         _ images: [DiaryImage],
         width: CGFloat
@@ -220,14 +316,42 @@ struct ImageGridView: View {
                 images[0],
                 images[1],
                 width: width,
-                height: 180
+                height: 180 * scale
             )
 
             twoCellRow(
                 images[2],
                 images[3],
                 width: width,
-                height: 180
+                height: 180 * scale
+            )
+        }
+        .frame(
+            width: width,
+            alignment: .leading
+        )
+        .clipped()
+    }
+    /*
+    private func fourImages(
+        _ images: [DiaryImage],
+        width: CGFloat
+    ) -> some View {
+
+        VStack(spacing: spacing) {
+
+            twoCellRow(
+                images[0],
+                images[1],
+                width: width,
+                height: 180 * scale
+            )
+
+            twoCellRow(
+                images[2],
+                images[3],
+                width: width,
+                height: 180 * scale
             )
         }
         .frame(
@@ -235,7 +359,7 @@ struct ImageGridView: View {
             alignment: .leading
         )
     }
-
+  */
     private func manyImages(
         _ images: [DiaryImage],
         width: CGFloat
@@ -254,7 +378,44 @@ struct ImageGridView: View {
                 visibleImages[0],
                 visibleImages[1],
                 width: width,
-                height: 180
+                height: 180 * scale
+            )
+
+            twoCellRow(
+                visibleImages[2],
+                visibleImages[3],
+                width: width,
+                height: 180 * scale,
+                remainingCount: remainingCount
+            )
+        }
+        .frame(
+            width: width,
+            alignment: .leading
+        )
+        .clipped()
+    }
+    
+    /*
+    private func manyImages(
+        _ images: [DiaryImage],
+        width: CGFloat
+    ) -> some View {
+
+        let visibleImages = Array(
+            images.prefix(4)
+        )
+
+        let remainingCount =
+            images.count - 4
+
+        return VStack(spacing: spacing) {
+
+            twoCellRow(
+                visibleImages[0],
+                visibleImages[1],
+                width: width,
+                height: 180 * scale
             )
 
             let cellWidth = max(
@@ -267,19 +428,19 @@ struct ImageGridView: View {
                 mediaCell(
                     visibleImages[2],
                     width: cellWidth,
-                    height: 180
+                    height: 180 * scale
                 )
 
                 mediaCell(
                     visibleImages[3],
                     width: cellWidth,
-                    height: 180,
+                    height: 180 * scale,
                     remainingCount: remainingCount
                 )
             }
             .frame(
                 width: width,
-                height: 180,
+                height: 180 * scale,
                 alignment: .leading
             )
         }
@@ -288,7 +449,43 @@ struct ImageGridView: View {
             alignment: .leading
         )
     }
+*/
+    private func twoCellRow(
+        _ image1: DiaryImage,
+        _ image2: DiaryImage,
+        width: CGFloat,
+        height: CGFloat,
+        remainingCount: Int = 0
+    ) -> some View {
 
+        let cellWidth = max(
+            0,
+            (width - spacing) / 2
+        )
+
+        return HStack(spacing: spacing) {
+
+            mediaCell(
+                image1,
+                width: cellWidth,
+                height: height
+            )
+
+            mediaCell(
+                image2,
+                width: cellWidth,
+                height: height,
+                remainingCount: remainingCount
+            )
+        }
+        .frame(
+            width: width,
+            height: height,
+            alignment: .leading
+        )
+        .clipped()
+    }
+    /*
     private func twoCellRow(
         _ image1: DiaryImage,
         _ image2: DiaryImage,
@@ -321,7 +518,7 @@ struct ImageGridView: View {
             alignment: .leading
         )
     }
-
+*/
     // MARK: - Media cell
 
     @ViewBuilder
