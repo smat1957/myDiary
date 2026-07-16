@@ -15,7 +15,13 @@ import Foundation
 extension TimelineViewModel {
 
     // MARK: - Navigation
-
+    
+    func showPost(
+        _ postID: Int64
+    ) {
+        currentPostID = postID
+    }
+    
     var canGoBack: Bool {
         !navigationStack.isEmpty
     }
