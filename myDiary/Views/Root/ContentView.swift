@@ -34,6 +34,11 @@ struct ContentView: View {
                 posts: vm.posts,
                 postDictionary: vm.postDictionary,
                 currentPostID: vm.currentPostID,
+                focusedPostID: vm.focusedPostID,
+
+                onClearFocusedPost: {
+                    vm.clearFocusedPost()
+                },
 
                 onDeleteImage: { post, image in
                     vm.deleteImage(

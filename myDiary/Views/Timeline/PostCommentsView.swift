@@ -220,6 +220,7 @@ struct PostCommentsView: View {
                             onReplyPost: onReplyPost
                         )
                     }
+                    .id(comment.id)
                     .padding(
                         .leading,
                         indentation

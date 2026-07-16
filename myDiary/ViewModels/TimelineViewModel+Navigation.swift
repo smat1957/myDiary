@@ -14,34 +14,81 @@ import Foundation
 
 extension TimelineViewModel {
 
-    // MARK: - Navigation
-    
-    func showPost(
-        _ postID: Int64
-    ) {
-        currentPostID = postID
-    }
-    
     var canGoBack: Bool {
-        !navigationStack.isEmpty
+        !navigation.history.isEmpty
     }
 
+    // MARK: - 履歴を残す移動
+
+    /// 関連記事など、戻る操作が必要な移動。
     func jumpToPost(
         _ targetPostID: Int64,
-        from currentPostID: Int64?
+        from sourcePostID: Int64?
     ) {
-        guard targetPostID != currentPostID else {
+        guard
+            targetPostID !=
+                navigation.currentTarget?.postID
+        else {
             return
         }
 
-        if let currentPostID {
-            navigationStack.append(
-                currentPostID
+        if let currentTarget =
+            navigation.currentTarget
+        {
+            navigation.history.append(
+                currentTarget
+            )
+
+        } else if let sourcePostID {
+            navigation.history.append(
+                TimelineNavigationTarget(
+                    postID: sourcePostID,
+                    focusedPostID: nil
+                )
             )
         }
 
-        self.currentPostID =
-            targetPostID
+        navigation.currentTarget =
+            TimelineNavigationTarget(
+                postID: targetPostID,
+                focusedPostID: nil
+            )
+    }
+
+    // MARK: - 履歴を残さない表示
+
+    /// 投稿を表示する。
+    /// コメント紐付け後や検索結果表示などに使う。
+    func showPost(
+        _ postID: Int64
+    ) {
+        navigation.currentTarget =
+            TimelineNavigationTarget(
+                postID: postID,
+                focusedPostID: nil
+            )
+    }
+
+    /// 親投稿を表示し、その中のコメントや返信に注目する。
+    func showPost(
+        _ postID: Int64,
+        focusedOn focusedPostID: Int64
+    ) {
+        navigation.currentTarget =
+            TimelineNavigationTarget(
+                postID: postID,
+                focusedPostID:
+                    focusedPostID
+            )
+        /*
+        print(
+            "NavigationTarget:",
+            "post:",
+            postID,
+            "focus:",
+            focusedPostID
+        )
+        */
     }
 
     func openLinkedPost(
@@ -49,7 +96,9 @@ extension TimelineViewModel {
         from sourcePostID: Int64
     ) {
         guard
-            postDictionary[targetPostID] != nil
+            postDictionary[
+                targetPostID
+            ] != nil
         else {
             return
         }
@@ -62,13 +111,31 @@ extension TimelineViewModel {
 
     func goBack() {
         guard
-            let previousID =
-                navigationStack.popLast()
+            let previousTarget =
+                navigation.history.popLast()
         else {
             return
         }
 
-        currentPostID =
-            previousID
+        navigation.currentTarget =
+            previousTarget
+    }
+
+    /// 注目対象を消す。
+    /// スクロールとハイライト完了後に呼ぶ。
+    func clearFocusedPost() {
+        guard
+            let currentTarget =
+                navigation.currentTarget
+        else {
+            return
+        }
+
+        navigation.currentTarget =
+            TimelineNavigationTarget(
+                postID:
+                    currentTarget.postID,
+                focusedPostID: nil
+            )
     }
 }

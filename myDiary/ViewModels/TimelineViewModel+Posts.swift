@@ -67,14 +67,14 @@ extension TimelineViewModel {
         do {
             try repository.delete(post)
 
-            navigationStack.removeAll {
-                $0 == post.id
+            navigation.history.removeAll {
+                $0.postID == post.id
             }
-
+            
             if currentPostID == post.id {
-                currentPostID = nil
+                navigation.currentTarget = nil
             }
-
+            
             loadPosts()
 
         } catch {

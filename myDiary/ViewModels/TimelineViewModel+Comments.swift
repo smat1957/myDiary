@@ -37,7 +37,7 @@ extension TimelineViewModel {
                 return $0.id < $1.id
             }
     }
-/*
+
     func linkComment(
         _ comment: DiaryPost,
         to parent: DiaryPost
@@ -58,36 +58,11 @@ extension TimelineViewModel {
 
             loadPosts()
 
-        } catch {
-            print(
-                "コメントの親投稿設定失敗:",
-                error.localizedDescription
-            )
-        }
-    }
-*/
-    func linkComment(
-        _ comment: DiaryPost,
-        to parent: DiaryPost
-    ) {
-        guard comment.id != parent.id else {
-            return
-        }
-
-        do {
-            var updatedComment = comment
-
-            updatedComment.parentPostId = parent.id
-            updatedComment.updatedAt = Date()
-
-            try repository.update(
-                updatedComment
+            showPost(
+                parent.id,
+                focusedOn: comment.id
             )
 
-            loadPosts()
-
-            showPost(parent.id)
-            
         } catch {
             print(
                 "コメントの親投稿設定失敗:",

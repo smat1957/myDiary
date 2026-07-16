@@ -13,6 +13,8 @@ struct TimelineView: View {
     let posts: [DiaryPost]
     let postDictionary: [Int64: DiaryPost]
     let currentPostID: Int64?
+    let focusedPostID: Int64?
+    let onClearFocusedPost: () -> Void
 
     let onDeleteImage: (DiaryPost, DiaryImage) -> Void
     let onDeletePost: (DiaryPost) -> Void
@@ -29,7 +31,7 @@ struct TimelineView: View {
     ) -> Void
     let onUnlinkComment: (DiaryPost) -> Void
     let onReplyPost: (DiaryPost) -> Void
-    
+        
     @State private var viewerState: ImageViewerState?
     @State private var pendingDeletePost: DiaryPost?
     @State private var linkSourcePost: DiaryPost?
@@ -118,21 +120,51 @@ struct TimelineView: View {
                 }
                 .padding()
             }
-            .onChange(of: currentPostID) { _, newID in
-                guard let newID else {
+            .onChange(
+                of: currentPostID
+            ) { _, newID in
+
+                scrollTo(
+                    newID,
+                    anchor: .top,
+                    animated: true,
+                    proxy: proxy
+                )
+            }
+            .onChange(
+                of: focusedPostID
+            ) { _, focusedID in
+
+                guard focusedID != nil else {
                     return
                 }
 
-                withAnimation {
-                    proxy.scrollTo(newID, anchor: .top)
+                /*
+                 親投稿の表示更新とコメントViewの生成が
+                 終わった後にスクロールする。
+                 */
+                DispatchQueue.main.async {
+                    scrollTo(
+                        focusedID,
+                        anchor: .center,
+                        animated: true,
+                        proxy: proxy
+                    )
+
+                    /*
+                     focusedPostIDを消して、
+                     同じ対象へ何度もスクロールしないようにする。
+                     */
+                    onClearFocusedPost()
                 }
             }
             .onAppear {
-                guard let currentPostID else {
-                    return
-                }
-
-                proxy.scrollTo(currentPostID, anchor: .top)
+                scrollTo(
+                    currentPostID,
+                    anchor: .top,
+                    animated: false,
+                    proxy: proxy
+                )
             }
         }
         .sheet(item: $viewerState) { state in
@@ -173,13 +205,6 @@ struct TimelineView: View {
                 posts: posts,
                 sourcePost: sourcePost,
                 onSelect: { targetPost in
-                    //print(
-                    //    "TimelineView onSelect:",
-                    //    sourcePost.id,
-                    //    "->",
-                    //    targetPost.id
-                    //)
-
                     onCreateLink(
                         sourcePost,
                         targetPost
@@ -199,7 +224,32 @@ struct TimelineView: View {
                 }
             )
         }
-        
+    }
+
+    private func scrollTo(
+        _ id: Int64?,
+        anchor: UnitPoint,
+        animated: Bool,
+        proxy: ScrollViewProxy
+    ) {
+        guard let id else {
+            return
+        }
+
+        let operation = {
+            proxy.scrollTo(
+                id,
+                anchor: anchor
+            )
+        }
+
+        if animated {
+            withAnimation {
+                operation()
+            }
+        } else {
+            operation()
+        }
     }
 
     private func openImage(
