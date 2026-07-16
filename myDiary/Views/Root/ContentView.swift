@@ -8,24 +8,26 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-private enum FolderSelectionPurpose {
+enum FolderSelectionPurpose {
     case importPackage
     case exportPackage
 }
 
 struct ContentView: View {
 
-    @State private var vm = TimelineViewModel()
+    @State var vm = TimelineViewModel()
+
     @State private var showingEditor = false
     @State private var editingPost: DiaryPost?
-    //@State private var showingImporter = false
-    @State private var importMessage: String?
-    //@State private var showingExporter = false
-    @State private var exportMessage: String?
+
+    @State var importMessage: String?
+    @State var exportMessage: String?
+
     @State private var showingFolderSelector = false
     @State private var folderSelectionPurpose: FolderSelectionPurpose?
+
     @State private var replyParentPost: DiaryPost?
-    
+
     var body: some View {
         NavigationStack {
             TimelineView(
@@ -156,13 +158,6 @@ struct ContentView: View {
                     parentPost: parentPost
                 )
             }
-            .sheet(item: $replyParentPost) { parentPost in
-                PostEditorView(
-                    vm: vm,
-                    editingPost: nil,
-                    parentPost: parentPost
-                )
-            }
         }
         .fileImporter(
             isPresented: $showingFolderSelector,
@@ -252,92 +247,5 @@ struct ContentView: View {
             Text(exportMessage ?? "")
         }
     }
-    
-    private func importPackage(
-        from packageURL: URL
-    ) {
 
-        Task {
-            do {
-                let importer = DiaryImporter()
-
-                let importResult =
-                    try await importer.importPackage(
-                        from: packageURL
-                    )
-
-                await MainActor.run {
-
-                    vm.loadPosts()
-
-                    importMessage = """
-                    Diary Packageの読み込みが完了しました。
-
-                    新規投稿: \(importResult.importedPostCount)件
-                    既存投稿: \(importResult.skippedPostCount)件
-                    メディア: \(importResult.importedMediaCount)件
-                    投稿リンク: \(importResult.importedLinkCount)件
-                    メディアスキップ: \(importResult.skippedMediaCount)件
-                    """
-                }
-
-            } catch {
-
-                await MainActor.run {
-
-                    importMessage = """
-                    Diary Packageの読み込みに失敗しました。
-
-                    \(error.localizedDescription)
-                    """
-                }
-            }
-        }
-    }
-    
-    private func exportPackage(
-        to selectedFolder: URL
-    ) {
-
-        let accessing =
-            selectedFolder
-                .startAccessingSecurityScopedResource()
-
-        defer {
-            if accessing {
-                selectedFolder
-                    .stopAccessingSecurityScopedResource()
-            }
-        }
-
-        do {
-            let exporter = DiaryExporter()
-
-            let exportResult =
-                try exporter.exportPackage(
-                    posts: vm.posts,
-                    title: "myDiary Export",
-                    to: selectedFolder
-                )
-
-            exportMessage = """
-            Diary Packageの書き出しが完了しました。
-
-            投稿: \(exportResult.exportedPostCount)件
-            メディア: \(exportResult.exportedMediaCount)件
-            投稿リンク: \(exportResult.exportedLinkCount)件
-
-            保存先:
-            \(exportResult.outputURL.path)
-            """
-
-        } catch {
-
-            exportMessage = """
-            Diary Packageの書き出しに失敗しました。
-
-            \(error.localizedDescription)
-            """
-        }
-    }
 }
