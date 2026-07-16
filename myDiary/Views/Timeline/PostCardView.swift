@@ -32,83 +32,31 @@ struct PostCardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
 
-            HStack {
-                Text(post.createdAt.formatted(date: .abbreviated, time: .shortened))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            PostCardHeaderView(
+                post: post,
 
-                Text("ID: \(post.id)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                onLinkComment:
+                    onLinkComment,
 
-                Button {
-                    onLinkComment(post)
-                } label: {
-                    Label(
-                        "親投稿に紐付ける",
-                        systemImage: "arrow.turn.down.right"
-                    )
-                }
+                onReplyPost:
+                    onReplyPost,
 
-                Spacer()
-                
-                Button {
-                    onReplyPost(post)
-                } label: {
-                    Label(
-                        "返信",
-                        systemImage: "arrowshape.turn.up.left"
-                    )
-                }
-                .buttonStyle(.plain)
-                .help("コメントを追加")
-                
-                Button {
-                    onOpenViewer(post)
-                } label: {
-                    Image(systemName: "photo.on.rectangle")
-                }
+                onOpenViewer:
+                    onOpenViewer,
 
-                Button {
-                    //print(
-                    //    "PostCardView 関連記事追加:",
-                    //    post.id
-                    //)
+                onLinkPost:
+                    onLinkPost,
 
-                    onLinkPost(post)
-                } label: {
-                    Label(
-                        "関連記事を追加",
-                        systemImage: "link"
-                    )
+                onEditPost:
+                    onEditPost,
 
-                    //Image(systemName: "link")
-                }
-                .buttonStyle(.plain)
-                .help("関連投稿を追加")
-
-                Button {
-                    onEditPost(post)
-                } label: {
-                    Image(systemName: "pencil")
-                }
-                
-                Button {
-                    onDeletePost(post)
-                } label: {
-                    Image(systemName: "trash")
-                }
-                .buttonStyle(.plain)
-                
-            }
+                onDeletePost:
+                    onDeletePost
+            )
 
             Text(attributedBody(post.body))
                 .font(.body)
                 .textSelection(.enabled)
-
-            Text("画像数: \(post.images.count)")
-                .font(.caption)
-                .foregroundStyle(.red)
 
             if !post.images.isEmpty {
                 ImageGridView(
@@ -126,11 +74,30 @@ struct PostCardView: View {
             }
             
             if !post.links.isEmpty {
-                relatedPostsSection
+
+                RelatedPostsSectionView(
+                    post: post,
+                    postDictionary:
+                        postDictionary,
+
+                    onOpenLinkedPost:
+                        onOpenLinkedPost,
+
+                    onDeleteLink:
+                        onDeleteLink,
+
+                    onMoveLink:
+                        onMoveLink
+                )
             }
             
             if !backlinks.isEmpty {
-                backlinksSection
+
+                BacklinksSectionView(
+                    backlinks: backlinks,
+                    onOpenLinkedPost:
+                        onOpenLinkedPost
+                )
             }
             
             PostCommentsView(
@@ -170,40 +137,6 @@ struct PostCardView: View {
                 onReplyPost: onReplyPost
 
             )
-            /*
-            PostCommentsView(
-                parentPost: post,
-                posts: posts,
-                onUnlinkComment: { comment in
-                    onUnlinkComment(comment)
-                },
-                onTapImage: {
-                    _,
-                    image in
-
-                    onTapImage(
-                        image
-                    )
-                },
-                onDeleteImage: {
-                    comment,
-                    image in
-
-                    onDeleteImage(
-                        comment,
-                        image
-                    )
-                },
-                onOpenSource: {
-                    image in
-
-                    onOpenSource(
-                        image
-                    )
-                }
-
-            )
-             */
             
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -243,169 +176,4 @@ struct PostCardView: View {
         return attributed
     }
     
-    private var relatedPostsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-
-            Divider()
-
-            Text("関連投稿")
-                .font(.headline)
-
-            ForEach(
-                Array(post.links.enumerated()),
-                id: \.element.id
-            ) { index, link in
-
-                if let targetPost = postDictionary[link.toPostId] {
-                    relatedPostRow(
-                        targetPost,
-                        index: index
-                    )
-                } else {
-                    missingPostRow(
-                        targetPostID: link.toPostId
-                    )
-                }
-            }
-        }
-        .padding(.top, 8)
-    }
-
-    private func relatedPostRow(
-        _ targetPost: DiaryPost,
-        index: Int
-    ) -> some View {
-
-        HStack(spacing: 10) {
-
-            Button {
-                onOpenLinkedPost(targetPost.id)
-            } label: {
-                HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "arrow.turn.down.right")
-                        .padding(.top, 3)
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("ID: \(targetPost.id)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-
-                        Text(summaryText(for: targetPost))
-                            .lineLimit(2)
-                            .foregroundStyle(.primary)
-                    }
-
-                    Spacer()
-                }
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                onMoveLink(index, index - 1)
-            } label: {
-                Image(systemName: "chevron.up")
-            }
-            .buttonStyle(.plain)
-            .disabled(index == 0)
-            .help("上へ移動")
-
-            Button {
-                onMoveLink(index, index + 1)
-            } label: {
-                Image(systemName: "chevron.down")
-            }
-            .buttonStyle(.plain)
-            .disabled(index == post.links.count - 1)
-            .help("下へ移動")
-
-            Button {
-                onDeleteLink(targetPost.id)
-            } label: {
-                Image(systemName: "xmark.circle")
-            }
-            .buttonStyle(.plain)
-            .help("関連投稿から削除")
-        }
-        .padding(.vertical, 3)
-    }
-
-    private func missingPostRow(
-        targetPostID: Int64
-    ) -> some View {
-
-        HStack {
-            Image(systemName: "exclamationmark.triangle")
-                .foregroundStyle(.secondary)
-
-            Text("投稿 ID \(targetPostID) が見つかりません")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Spacer()
-
-            Button {
-                onDeleteLink(targetPostID)
-            } label: {
-                Image(systemName: "xmark.circle")
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private func summaryText(
-        for post: DiaryPost
-    ) -> String {
-
-        let trimmed = post.body
-            .trimmingCharacters(
-                in: .whitespacesAndNewlines
-            )
-
-        if trimmed.isEmpty {
-            return "本文なし"
-        }
-
-        return trimmed
-            .replacingOccurrences(
-                of: "\n",
-                with: " "
-            )
-    }
-    
-    private var backlinksSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-
-            Divider()
-
-            Text("この投稿を参照している投稿")
-                .font(.headline)
-
-            ForEach(backlinks) { sourcePost in
-                Button {
-                    onOpenLinkedPost(sourcePost.id)
-                } label: {
-                    HStack(alignment: .top, spacing: 8) {
-                        Image(systemName: "arrow.turn.up.left")
-                            .padding(.top, 3)
-
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("ID: \(sourcePost.id)")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-
-                            Text(summaryText(for: sourcePost))
-                                .lineLimit(2)
-                                .foregroundStyle(.primary)
-                        }
-
-                        Spacer()
-                    }
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(.top, 8)
-    }
 }
