@@ -55,7 +55,7 @@ struct PostCardView: View {
             )
 
             Text(attributedBody(post.body))
-                .font(.body)
+                .font(.title3)
                 .textSelection(.enabled)
 
             if !post.images.isEmpty {

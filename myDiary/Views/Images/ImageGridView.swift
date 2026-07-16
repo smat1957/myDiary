@@ -133,19 +133,7 @@ struct ImageGridView: View {
             height: 320 * scale
         )
     }
-    /*
-    private func singleImage(
-        _ image: DiaryImage,
-        width: CGFloat
-    ) -> some View {
 
-        mediaCell(
-            image,
-            width: width,
-            height: 320 * scale
-        )
-    }
-    */
     private func twoImages(
         _ image1: DiaryImage,
         _ image2: DiaryImage,
@@ -178,39 +166,7 @@ struct ImageGridView: View {
         )
         .clipped()
     }
-    /*
-    private func twoImages(
-        _ image1: DiaryImage,
-        _ image2: DiaryImage,
-        width: CGFloat
-    ) -> some View {
 
-        let cellWidth = max(
-            0,
-            (width - spacing) / 2
-        )
-
-        return HStack(spacing: spacing) {
-
-            mediaCell(
-                image1,
-                width: cellWidth,
-                height: 260 * scale
-            )
-
-            mediaCell(
-                image2,
-                width: cellWidth,
-                height: 260 * scale
-            )
-        }
-        .frame(
-            width: width,
-            height: 260 * scale,
-            alignment: .leading
-        )
-    }
-*/
     private func threeImages(
         _ image1: DiaryImage,
         _ image2: DiaryImage,
@@ -257,54 +213,7 @@ struct ImageGridView: View {
         )
         .clipped()
     }
-    /*
-    private func threeImages(
-        _ image1: DiaryImage,
-        _ image2: DiaryImage,
-        _ image3: DiaryImage,
-        width: CGFloat
-    ) -> some View {
 
-        let cellWidth = max(
-            0,
-            (width - spacing) / 2
-        )
-
-        return VStack(spacing: spacing) {
-
-            mediaCell(
-                image1,
-                width: width,
-                height: 220 * scale
-            )
-
-            HStack(spacing: spacing) {
-
-                mediaCell(
-                    image2,
-                    width: cellWidth,
-                    height: 180 * scale
-                )
-
-                mediaCell(
-                    image3,
-                    width: cellWidth,
-                    height: 180 * scale
-                )
-            }
-            .frame(
-                width: width,
-                height: 180 * scale,
-                alignment: .leading
-            )
-        }
-        .frame(
-            width: width,
-            height: 180 * scale,
-            alignment: .leading
-        )
-    }
-*/
     private func fourImages(
         _ images: [DiaryImage],
         width: CGFloat
@@ -332,34 +241,7 @@ struct ImageGridView: View {
         )
         .clipped()
     }
-    /*
-    private func fourImages(
-        _ images: [DiaryImage],
-        width: CGFloat
-    ) -> some View {
 
-        VStack(spacing: spacing) {
-
-            twoCellRow(
-                images[0],
-                images[1],
-                width: width,
-                height: 180 * scale
-            )
-
-            twoCellRow(
-                images[2],
-                images[3],
-                width: width,
-                height: 180 * scale
-            )
-        }
-        .frame(
-            width: width,
-            alignment: .leading
-        )
-    }
-  */
     private func manyImages(
         _ images: [DiaryImage],
         width: CGFloat
@@ -396,60 +278,6 @@ struct ImageGridView: View {
         .clipped()
     }
     
-    /*
-    private func manyImages(
-        _ images: [DiaryImage],
-        width: CGFloat
-    ) -> some View {
-
-        let visibleImages = Array(
-            images.prefix(4)
-        )
-
-        let remainingCount =
-            images.count - 4
-
-        return VStack(spacing: spacing) {
-
-            twoCellRow(
-                visibleImages[0],
-                visibleImages[1],
-                width: width,
-                height: 180 * scale
-            )
-
-            let cellWidth = max(
-                0,
-                (width - spacing) / 2
-            )
-
-            HStack(spacing: spacing) {
-
-                mediaCell(
-                    visibleImages[2],
-                    width: cellWidth,
-                    height: 180 * scale
-                )
-
-                mediaCell(
-                    visibleImages[3],
-                    width: cellWidth,
-                    height: 180 * scale,
-                    remainingCount: remainingCount
-                )
-            }
-            .frame(
-                width: width,
-                height: 180 * scale,
-                alignment: .leading
-            )
-        }
-        .frame(
-            width: width,
-            alignment: .leading
-        )
-    }
-*/
     private func twoCellRow(
         _ image1: DiaryImage,
         _ image2: DiaryImage,
@@ -485,40 +313,7 @@ struct ImageGridView: View {
         )
         .clipped()
     }
-    /*
-    private func twoCellRow(
-        _ image1: DiaryImage,
-        _ image2: DiaryImage,
-        width: CGFloat,
-        height: CGFloat
-    ) -> some View {
 
-        let cellWidth = max(
-            0,
-            (width - spacing) / 2
-        )
-
-        return HStack(spacing: spacing) {
-
-            mediaCell(
-                image1,
-                width: cellWidth,
-                height: height
-            )
-
-            mediaCell(
-                image2,
-                width: cellWidth,
-                height: height
-            )
-        }
-        .frame(
-            width: width,
-            height: height,
-            alignment: .leading
-        )
-    }
-*/
     // MARK: - Media cell
 
     @ViewBuilder
@@ -555,31 +350,28 @@ struct ImageGridView: View {
                         for: image
                     )
 
-                    if let remainingCount {
-
+                    if let remainingCount,
+                       remainingCount > 0 {
+                        
                         Color.black
                             .opacity(0.45)
                             .frame(
                                 width: width,
                                 height: height
                             )
-
-                        Text(
-                            "+\(remainingCount)"
-                        )
-                        .font(
-                            .system(
-                                size: 42,
-                                weight: .bold
+                        
+                        Text("+\(remainingCount)")
+                            .font(
+                                .system(
+                                    size: 42,
+                                    weight: .bold
+                                )
                             )
-                        )
-                        .foregroundStyle(
-                            .white
-                        )
-                        .frame(
-                            width: width,
-                            height: height
-                        )
+                            .foregroundStyle(.white)
+                            .frame(
+                                width: width,
+                                height: height
+                            )
                     }
                 }
                 .frame(

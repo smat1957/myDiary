@@ -122,9 +122,9 @@ struct PostCommentsView: View {
 
     private var bodyFontSize: CGFloat {
         max(
-            13,
-            16
-                - CGFloat(depth) * 1.5
+            12,
+            15
+                - CGFloat(depth)
         )
     }
 
@@ -259,14 +259,16 @@ struct PostCommentsView: View {
                         time: .shortened
                     )
                 )
-                .font(.caption)
+                .font(.system(size: headerFontSize))
                 .foregroundStyle(.secondary)
 
                 Spacer()
 
                 if comment.packagePostID != nil {
                     Text("Facebook")
-                        .font(.caption2)
+                        .font( .system(
+                            size: headerFontSize - 1
+                        ))
                         .foregroundStyle(.tertiary)
                 }
                 

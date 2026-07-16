@@ -124,12 +124,14 @@ struct TimelineView: View {
                 of: currentPostID
             ) { _, newID in
 
-                scrollTo(
-                    newID,
-                    anchor: .top,
-                    animated: true,
-                    proxy: proxy
-                )
+                Task { @MainActor in
+                    await scrollTo(
+                        newID,
+                        anchor: .top,
+                        animated: true,
+                        proxy: proxy
+                    )
+                }
             }
             .onChange(
                 of: focusedPostID
@@ -139,12 +141,16 @@ struct TimelineView: View {
                     return
                 }
 
-                /*
-                 親投稿の表示更新とコメントViewの生成が
-                 終わった後にスクロールする。
-                 */
-                DispatchQueue.main.async {
-                    scrollTo(
+                Task { @MainActor in
+                    /*
+                     親投稿と、その中のコメント階層が
+                     レイアウトされるまで少し待つ。
+                     */
+                    try? await Task.sleep(
+                        for: .milliseconds(200)
+                    )
+
+                    await scrollTo(
                         focusedID,
                         anchor: .center,
                         animated: true,
@@ -152,19 +158,20 @@ struct TimelineView: View {
                     )
 
                     /*
-                     focusedPostIDを消して、
-                     同じ対象へ何度もスクロールしないようにする。
+                     スクロール処理後に注目対象をクリアする。
                      */
                     onClearFocusedPost()
                 }
             }
             .onAppear {
-                scrollTo(
-                    currentPostID,
-                    anchor: .top,
-                    animated: false,
-                    proxy: proxy
-                )
+                Task { @MainActor in
+                    await scrollTo(
+                        currentPostID,
+                        anchor: .top,
+                        animated: false,
+                        proxy: proxy
+                    )
+                }
             }
         }
         .sheet(item: $viewerState) { state in
@@ -225,16 +232,25 @@ struct TimelineView: View {
             )
         }
     }
-
+    
+    @MainActor
     private func scrollTo(
         _ id: Int64?,
         anchor: UnitPoint,
         animated: Bool,
         proxy: ScrollViewProxy
-    ) {
+    ) async {
+
         guard let id else {
             return
         }
+
+        /*
+         SwiftUIが投稿カードやコメントViewを
+         レイアウトする機会を与える。
+         */
+        await Task.yield()
+        await Task.yield()
 
         let operation = {
             proxy.scrollTo(
