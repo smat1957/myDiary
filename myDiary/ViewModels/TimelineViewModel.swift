@@ -5,6 +5,60 @@
 //  Created by 的池秋成 on 2026/07/06.
 //
 
+//
+//  TimelineViewModel.swift
+//  myDiary
+//
+
+import Foundation
+import Observation
+
+@Observable
+final class TimelineViewModel {
+
+    var posts: [DiaryPost] = []
+
+    var navigationStack: [Int64] = []
+    var currentPostID: Int64?
+
+    let repository = PostRepository()
+
+    init() {
+        _ = DatabaseManager.shared
+        loadPosts()
+    }
+
+    // MARK: - Timeline
+
+    /// タイムライン本体に表示する投稿。
+    /// 親投稿に紐付いたコメントは除外する。
+    var timelinePosts: [DiaryPost] {
+        posts.filter {
+            $0.parentPostId == nil
+        }
+    }
+
+    // MARK: - Post lookup
+
+    var postDictionary: [Int64: DiaryPost] {
+        Dictionary(
+            uniqueKeysWithValues: posts.map {
+                ($0.id, $0)
+            }
+        )
+    }
+
+    func post(
+        for id: Int64
+    ) -> DiaryPost? {
+        postDictionary[id]
+    }
+}
+
+
+
+
+/*
 import Foundation
 import Observation
 
@@ -417,3 +471,4 @@ final class TimelineViewModel {
         return result
     }
 }
+*/
