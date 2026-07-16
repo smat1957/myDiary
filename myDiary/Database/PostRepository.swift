@@ -15,49 +15,7 @@ final class PostRepository {
     init(dbQueue: DatabaseQueue = DatabaseManager.shared.dbQueue) {
         self.dbQueue = dbQueue
     }
-    /*
-    func debugPostLinks() {
-        do {
-            try dbQueue.read { db in
 
-                let count = try Int.fetchOne(
-                    db,
-                    sql: """
-                    SELECT COUNT(*)
-                    FROM post_links
-                    """
-                ) ?? 0
-
-                print(
-                    "DB post_links件数:",
-                    count
-                )
-
-                let records = try PostLinkRecord
-                    .order(Column("id"))
-                    .fetchAll(db)
-
-                for record in records {
-                    print(
-                        "DB LINK:",
-                        record.id ?? 0,
-                        record.fromPostId,
-                        "->",
-                        record.toPostId,
-                        "sort:",
-                        record.sortOrder
-                    )
-                }
-            }
-
-        } catch {
-            print(
-                "post_links診断失敗:",
-                error
-            )
-        }
-    }
-    */
     func fetchAll() throws -> [DiaryPost] {
         try dbQueue.read { db in
             let postRecords = try PostRecord
@@ -73,14 +31,6 @@ final class PostRepository {
                     fromPostID: postRecord.id!,
                     db: db
                 )
-                //if !links.isEmpty {
-                //    print(
-                //        "fetchAll link:",
-                //        postRecord.id ?? 0,
-                //        "件数:",
-                //        links.count
-                //    )
-                //}
                 let post = DiaryPost(
                     id: postRecord.id ?? 0,
                     packagePostID: postRecord.packagePostID,
@@ -95,18 +45,6 @@ final class PostRepository {
 
                 return post
 
-                /*
-                return DiaryPost(
-                    id: postRecord.id!,
-                    packagePostID: postRecord.packagePostID,
-                    body: postRecord.body,
-                    diaryDate: postRecord.diaryDate,
-                    createdAt: postRecord.createdAt,
-                    updatedAt: postRecord.updatedAt,
-                    images: images,
-                    links: links
-                )
-                 */
             }
         }
     }
@@ -160,59 +98,103 @@ final class PostRepository {
             return postID
         }
     }
-    
+
     func update(_ post: DiaryPost) throws {
         try dbQueue.write { db in
-
-            var postRecord = PostRecord(
-                id: post.id,
-                packagePostID: post.packagePostID,
-                body: post.body,
-                diaryDate: post.diaryDate,
-                createdAt: post.createdAt,
-                updatedAt: Date(),
-                parentPostId: post.parentPostId
+            try updatePostRecord(
+                post,
+                db: db
             )
-            
-            try postRecord.update(db)
 
-            try ImageRecord
-                .filter(Column("postId") == post.id)
-                .deleteAll(db)
+            try replaceLinks(
+                for: post,
+                db: db
+            )
 
-            try PostLinkRecord
-                .filter(Column("fromPostId") == post.id)
-                .deleteAll(db)
-            
-            for (index, link) in post.links.enumerated() {
-
-                var record = PostLinkRecord(
-                    id: nil,
-                    fromPostId: post.id,
-                    toPostId: link.toPostId,
-                    sortOrder: index
-                )
-
-                try record.insert(db)
-            }
-            
-            for (index, image) in post.images.enumerated() {
-
-                var imageRecord = ImageRecord(
-                    id: nil,
-                    postId: post.id,
-                    baseName: image.baseName,
-                    originalExtension: image.originalExtension,
-                    sourceType: image.sourceType.rawValue,
-                    sourceURL: image.sourceURL?.absoluteString,
-                    sortOrder: index
-                )
-                
-                try imageRecord.insert(db)
-            }
-            
+            try replaceImages(
+                for: post,
+                db: db
+            )
         }
     }
+    
+    private func updatePostRecord(
+        _ post: DiaryPost,
+        db: Database
+    ) throws {
+
+        var postRecord = PostRecord(
+            id: post.id,
+            packagePostID: post.packagePostID,
+            body: post.body,
+            diaryDate: post.diaryDate,
+            createdAt: post.createdAt,
+            updatedAt: Date(),
+            parentPostId: post.parentPostId
+        )
+
+        try postRecord.update(db)
+    }
+    
+    private func replaceLinks(
+        for post: DiaryPost,
+        db: Database
+    ) throws {
+
+        try PostLinkRecord
+            .filter(
+                Column("fromPostId")
+                    == post.id
+            )
+            .deleteAll(db)
+
+        for (index, link) in
+            post.links.enumerated()
+        {
+            var record = PostLinkRecord(
+                id: nil,
+                fromPostId: post.id,
+                toPostId: link.toPostId,
+                sortOrder: index
+            )
+
+            try record.insert(db)
+        }
+    }
+    
+    private func replaceImages(
+        for post: DiaryPost,
+        db: Database
+    ) throws {
+
+        try ImageRecord
+            .filter(
+                Column("postId")
+                    == post.id
+            )
+            .deleteAll(db)
+
+        for (index, image) in
+            post.images.enumerated()
+        {
+            var imageRecord = ImageRecord(
+                id: nil,
+                postId: post.id,
+                baseName: image.baseName,
+                originalExtension:
+                    image.originalExtension,
+                sourceType:
+                    image.sourceType.rawValue,
+                sourceURL:
+                    image.sourceURL?
+                        .absoluteString,
+                sortOrder: index
+            )
+
+            try imageRecord.insert(db)
+        }
+    }
+    
     
     func delete(_ post: DiaryPost) throws {
         try dbQueue.write { db in
