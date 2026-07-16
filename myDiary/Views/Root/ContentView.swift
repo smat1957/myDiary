@@ -27,7 +27,9 @@ struct ContentView: View {
     @State private var folderSelectionPurpose: FolderSelectionPurpose?
 
     @State private var replyParentPost: DiaryPost?
-
+    
+    @State private var showingSearch = false
+    
     var body: some View {
         NavigationStack {
             TimelineView(
@@ -127,6 +129,23 @@ struct ContentView: View {
                         Image(systemName: "square.and.arrow.down")
                     }
                     .help("Diary Packageを読み込む")
+
+                    Button {
+                        folderSelectionPurpose = .exportPackage
+                        showingFolderSelector = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .help("Diary Packageを書き出す")
+
+                    Button {
+                        showingSearch = true
+                    } label: {
+                        Image(
+                            systemName: "magnifyingglass"
+                        )
+                    }
+                    .help("投稿を検索")
                     
                     Button {
                         showingEditor = true
@@ -135,13 +154,6 @@ struct ContentView: View {
                     }
                     .help("新しい投稿")
                     
-                    Button {
-                        folderSelectionPurpose = .exportPackage
-                        showingFolderSelector = true
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    .help("Diary Packageを書き出す")
                 }
             }
             .sheet(isPresented: $showingEditor) {
@@ -163,6 +175,18 @@ struct ContentView: View {
                     parentPost: parentPost
                 )
             }
+        }
+        .sheet(
+            isPresented: $showingSearch
+        ) {
+            PostSearchView(
+                vm: vm,
+                onSelect: { result in
+                    vm.openSearchResult(
+                        result
+                    )
+                }
+            )
         }
         .fileImporter(
             isPresented: $showingFolderSelector,

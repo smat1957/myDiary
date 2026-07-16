@@ -25,6 +25,7 @@ final class TimelineViewModel {
     init() {
         _ = DatabaseManager.shared
         loadPosts()
+        //debugSearch()
     }
     
     var currentPostID: Int64? {
