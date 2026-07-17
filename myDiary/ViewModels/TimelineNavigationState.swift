@@ -5,11 +5,6 @@
 //  Created by 的池秋成 on 2026/07/16.
 //
 
-//
-//  TimelineNavigationState.swift
-//  myDiary
-//
-
 import Foundation
 
 /// タイムライン上で表示する場所を表す。

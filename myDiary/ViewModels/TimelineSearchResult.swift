@@ -9,11 +9,6 @@
 //  myDiary
 //
 
-//
-//  TimelineSearchResult.swift
-//  myDiary
-//
-
 import Foundation
 
 struct TimelineSearchResult: Identifiable {

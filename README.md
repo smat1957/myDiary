@@ -7,6 +7,8 @@ Your diary remains yours, independent of any online platform.
 
 # myDiary
 
+This is a screenshot showing the app I’ve just created (which, of course, works offline) displaying a post I made on Facebook at 16:37 on 9 June 2023.
+
 ![Timeline](docs/images/timeline.png)
 
 A macOS diary application built with SwiftUI and SQLite.

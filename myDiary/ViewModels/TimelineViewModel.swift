@@ -5,11 +5,6 @@
 //  Created by 的池秋成 on 2026/07/06.
 //
 
-//
-//  TimelineViewModel.swift
-//  myDiary
-//
-
 import Foundation
 import Observation
 
@@ -25,6 +20,7 @@ final class TimelineViewModel {
     init() {
         _ = DatabaseManager.shared
         loadPosts()
+        resetNavigation()
         //debugSearch()
     }
     
@@ -61,5 +57,36 @@ final class TimelineViewModel {
         for id: Int64
     ) -> DiaryPost? {
         postDictionary[id]
+    }
+    
+    func rootPostID(
+        for post: DiaryPost
+    ) -> Int64? {
+
+        var currentPost = post
+        var visitedPostIDs: Set<Int64> = []
+
+        while let parentPostID =
+            currentPost.parentPostId
+        {
+            guard
+                visitedPostIDs.insert(
+                    currentPost.id
+                ).inserted
+            else {
+                return nil
+            }
+
+            guard
+                let parentPost =
+                    postDictionary[parentPostID]
+            else {
+                return nil
+            }
+
+            currentPost = parentPost
+        }
+
+        return currentPost.id
     }
 }

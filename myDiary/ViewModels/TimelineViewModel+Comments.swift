@@ -5,11 +5,6 @@
 //  Created by 的池秋成 on 2026/07/16.
 //
 
-//
-//  TimelineViewModel+Comments.swift
-//  myDiary
-//
-
 import Foundation
 
 extension TimelineViewModel {

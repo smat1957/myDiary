@@ -30,6 +30,9 @@ struct ContentView: View {
     
     @State private var showingSearch = false
     
+    //@Environment(\.openWindow)
+    //private var openWindow
+    
     var body: some View {
         NavigationStack {
             TimelineView(
@@ -154,6 +157,11 @@ struct ContentView: View {
                     }
                     .help("新しい投稿")
                     
+                    //Button {
+                    //    openWindow(id: "about")
+                    //} label: {
+                    //    Image(systemName: "info.circle")
+                    //}
                 }
             }
             .sheet(isPresented: $showingEditor) {

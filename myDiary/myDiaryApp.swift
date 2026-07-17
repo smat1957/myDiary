@@ -9,9 +9,24 @@ import SwiftUI
 
 @main
 struct myDiaryApp: App {
+
     var body: some Scene {
+
         WindowGroup {
             ContentView()
         }
+        .commands {
+            CommandGroup(replacing: .appInfo) {
+                AboutMenuCommand()
+            }
+        }
+
+        Window(
+            "About myDiary",
+            id: "about"
+        ) {
+            AboutView()
+        }
+        .windowResizability(.contentSize)
     }
 }
