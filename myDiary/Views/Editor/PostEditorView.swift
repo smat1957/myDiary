@@ -185,13 +185,23 @@ struct PostEditorView: View {
         .frame(width: 600, height: 600)
         .sheet(item: $viewerState) { state in
             ImageViewerView(
-                state: state
-            ) { deletedImage in
-                selectedImages.removeAll {
-                    $0.baseName == deletedImage.baseName
+                state: state,
+
+                onDelete: { _, deletedImage in
+                    selectedImages.removeAll {
+                        $0.baseName == deletedImage.baseName
+                    }
+
+                    ImageStore.shared.delete(
+                        deletedImage
+                    )
+                },
+
+                onUpdateImageOrder: { updatedPost in
+                    selectedImages =
+                        updatedPost.images
                 }
-                ImageStore.shared.delete(deletedImage)
-            }
+            )
         }
         .onAppear {
             guard let editingPost else {

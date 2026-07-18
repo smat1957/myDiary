@@ -51,7 +51,15 @@ struct ContentView: View {
                         from: post
                     )
                 },
+                
+                onUpdateImageOrder: {
+                    updatedPost in
 
+                    vm.updatePost(
+                        updatedPost
+                    )
+                },
+                
                 onDeletePost: { post in
                     vm.deletePost(post)
                 },

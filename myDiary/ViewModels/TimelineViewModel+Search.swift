@@ -17,28 +17,49 @@ extension TimelineViewModel {
     // MARK: - Search
 
     func searchPosts(
-        query: String
+        keyword: String,
+        date: Date?,
+        caseSensitive: Bool
     ) -> [TimelineSearchResult] {
 
-        let words = query
+        let words = keyword
             .trimmingCharacters(
                 in: .whitespacesAndNewlines
             )
-            .split {
-                $0.isWhitespace
-            }
+            .split(whereSeparator: \.isWhitespace)
             .map(String.init)
 
-        guard !words.isEmpty else {
+        guard !words.isEmpty || date != nil else {
             return []
         }
 
+        let calendar = Calendar.current
+
         return posts
             .filter { post in
-                matchesSearchWords(
-                    words,
-                    post: post
-                )
+
+                // 日付が指定されていれば同じ日の投稿だけにする
+                if let date,
+                   !calendar.isDate(
+                        post.diaryDate,
+                        inSameDayAs: date
+                   ) {
+                    return false
+                }
+
+                // キーワードがなければ日付条件だけで一致
+                guard !words.isEmpty else {
+                    return true
+                }
+
+                // 空白区切りのAND検索
+                return words.allSatisfy { word in
+                    contains(
+                        post.body,
+                        word: word,
+                        caseSensitive: caseSensitive
+                    )
+                }
             }
             .sorted {
                 if $0.diaryDate != $1.diaryDate {
@@ -48,64 +69,113 @@ extension TimelineViewModel {
                 return $0.id > $1.id
             }
             .map {
-                TimelineSearchResult(
-                    post: $0
-                )
+                TimelineSearchResult(post: $0)
             }
     }
 
-    private func matchesSearchWords(
-        _ words: [String],
-        post: DiaryPost
+    private func contains(
+        _ text: String,
+        word: String,
+        caseSensitive: Bool
     ) -> Bool {
 
-        let dateText = post.diaryDate.formatted(
-            date: .numeric,
-            time: .shortened
-        )
+        if caseSensitive {
+            return text.contains(word)
+        }
 
-        let searchableText = """
-        \(post.body)
-        \(dateText)
-        \(post.id)
-        """
+        return text.range(
+            of: word,
+            options: [
+                .caseInsensitive,
+                .diacriticInsensitive
+            ],
+            range: nil,
+            locale: .current
+        ) != nil
+    }
 
-        /*
-         空白で区切ったすべての語を含む場合に一致。
-         例：「Bach guitar」なら両方を含む投稿。
-         */
-        return words.allSatisfy { word in
-            searchableText
-                .localizedCaseInsensitiveContains(
-                    word
-                )
+    // MARK: - Newest / oldest
+
+    var newestRootPost: DiaryPost? {
+        rootPosts.max {
+            if $0.diaryDate != $1.diaryDate {
+                return $0.diaryDate < $1.diaryDate
+            }
+
+            return $0.id < $1.id
         }
     }
 
-    // MARK: - Open result
+    var oldestRootPost: DiaryPost? {
+        rootPosts.min {
+            if $0.diaryDate != $1.diaryDate {
+                return $0.diaryDate < $1.diaryDate
+            }
+
+            return $0.id < $1.id
+        }
+    }
+
+    private var rootPosts: [DiaryPost] {
+        posts.filter {
+            $0.parentPostId == nil
+        }
+    }
+
+    // MARK: - Open search result
+/*
+    func openSearchResult(
+        _ result: TimelineSearchResult
+    ) {
+        guard let rootPostID =
+            rootPostID(for: result.post)
+        else {
+            return
+        }
+
+        if result.post.id == rootPostID {
+
+            showPost(rootPostID)
+
+        } else {
+
+            showPost(
+                rootPostID,
+                focusedOn: result.post.id
+            )
+        }
+    }
+ */
     // MARK: - Open search result
 
     func openSearchResult(
         _ result: TimelineSearchResult
     ) {
-        let matchedPost = result.post
-
         guard
             let rootPostID =
-                rootPostID(for: matchedPost)
+                rootPostID(for: result.post)
         else {
             return
         }
 
         let focusedPostID: Int64? =
-            matchedPost.id == rootPostID
+            result.post.id == rootPostID
             ? nil
-            : matchedPost.id
+            : result.post.id
 
-        /*
-         検索前に表示していた投稿を履歴へ残す。
-         currentTarget がある場合だけ履歴へ追加する。
-         */
+        let newTarget =
+            TimelineNavigationTarget(
+                postID: rootPostID,
+                focusedPostID: focusedPostID
+            )
+
+        guard
+            newTarget != navigation.currentTarget
+        else {
+            return
+        }
+
+        // 現在位置を戻る履歴へ積む
         if let currentTarget =
             navigation.currentTarget
         {
@@ -115,11 +185,7 @@ extension TimelineViewModel {
         }
 
         navigation.currentTarget =
-            TimelineNavigationTarget(
-                postID: rootPostID,
-                focusedPostID: focusedPostID
-            )
+            newTarget
     }
-
+    
 }
-

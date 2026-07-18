@@ -9,9 +9,17 @@ import Foundation
 import AppKit
 import Observation
 
-enum ViewerImageKind {
-    case display
-    case original
+enum ViewerImageKind:
+    String,
+    CaseIterable,
+    Identifiable
+{
+    case display = "Display"
+    case original = "Original"
+
+    var id: Self {
+        self
+    }
 }
 
 @Observable
@@ -19,40 +27,96 @@ final class ImageViewerState: Identifiable {
 
     let id = UUID()
 
+    /*
+     Viewerを開いた時点の投稿情報。
+     画像配列だけはimagesで別に管理する。
+     */
     let post: DiaryPost
+
+    var images: [DiaryImage]
     var imageIndex: Int
 
-    init(post: DiaryPost, imageIndex: Int) {
+    var viewerImageKind:
+        ViewerImageKind = .display
+
+    init(
+        post: DiaryPost,
+        imageIndex: Int
+    ) {
         self.post = post
-        self.imageIndex = imageIndex
+        self.images = post.images
+
+        if post.images.indices.contains(
+            imageIndex
+        ) {
+            self.imageIndex = imageIndex
+        } else {
+            self.imageIndex = 0
+        }
     }
-    
-    var viewerImageKind: ViewerImageKind = .display
+
+    // MARK: - Current post
+
+    /*
+     現在の画像配列を反映した投稿。
+     並べ替えや削除時のDB更新に使用する。
+     */
+    var currentPost: DiaryPost {
+        var updatedPost = post
+        updatedPost.images = images
+        return updatedPost
+    }
+
+    // MARK: - Current image
+
+    var hasImages: Bool {
+        !images.isEmpty
+    }
+
+    var image: DiaryImage {
+        images[imageIndex]
+    }
+
+    var imageCount: Int {
+        images.count
+    }
+
+    var imageNumberText: String {
+        guard hasImages else {
+            return "0 / 0"
+        }
+
+        return "\(imageIndex + 1) / \(imageCount)"
+    }
 
     var currentURL: URL {
         switch viewerImageKind {
+
         case .display:
-            return ImageStore.shared.url(for: image, kind: .display)
+            return ImageStore.shared.url(
+                for: image,
+                kind: .display
+            )
+
         case .original:
-            return ImageStore.shared.url(for: image, kind: .original)
+            return ImageStore.shared.url(
+                for: image,
+                kind: .original
+            )
         }
     }
 
     var currentImage: NSImage? {
-        NSImage(contentsOf: currentURL)
-    }
-    
-    var image: DiaryImage {
-        post.images[imageIndex]
+        guard hasImages else {
+            return nil
+        }
+
+        return NSImage(
+            contentsOf: currentURL
+        )
     }
 
-    var imageCount: Int {
-        post.images.count
-    }
-
-    var imageNumberText: String {
-        "\(imageIndex + 1) / \(imageCount)"
-    }
+    // MARK: - Navigation
 
     var hasPrevious: Bool {
         imageIndex > 0
@@ -62,47 +126,108 @@ final class ImageViewerState: Identifiable {
         imageIndex < imageCount - 1
     }
 
-    var displayURL: URL {
-        ImageStore.shared.url(for: image, kind: .display)
-    }
-
-    var originalURL: URL {
-        ImageStore.shared.url(for: image, kind: .original)
-    }
-
-    var thumbnailURL: URL {
-        ImageStore.shared.url(for: image, kind: .thumbnail)
-    }
-
-    var displayImage: NSImage? {
-        NSImage(contentsOf: displayURL)
-    }
-
-    var displayImageSizeText: String {
-        guard let image = displayImage else {
-            return ""
-        }
-
-        return "\(Int(image.size.width))×\(Int(image.size.height))"
-    }
-
     func showPrevious() {
-        if hasPrevious {
-            imageIndex -= 1
+        guard hasPrevious else {
+            return
         }
+
+        imageIndex -= 1
     }
 
     func showNext() {
-        if hasNext {
-            imageIndex += 1
+        guard hasNext else {
+            return
         }
+
+        imageIndex += 1
     }
 
     func showFirst() {
+        guard hasImages else {
+            return
+        }
+
         imageIndex = 0
     }
 
     func showLast() {
+        guard hasImages else {
+            return
+        }
+
         imageIndex = imageCount - 1
+    }
+
+    // MARK: - Image deletion
+
+    /*
+     現在表示中の画像を配列から削除する。
+
+     最後の画像を削除した場合は、
+     一つ前の画像へ移動する。
+     */
+    func removeCurrentImage() {
+        guard
+            images.indices.contains(
+                imageIndex
+            )
+        else {
+            return
+        }
+
+        images.remove(
+            at: imageIndex
+        )
+
+        guard !images.isEmpty else {
+            imageIndex = 0
+            return
+        }
+
+        if imageIndex >= images.count {
+            imageIndex = images.count - 1
+        }
+    }
+
+    // MARK: - Image ordering
+
+    var canMoveBackward: Bool {
+        imageIndex > 0
+    }
+
+    var canMoveForward: Bool {
+        imageIndex < imageCount - 1
+    }
+
+    /*
+     現在の画像を一つ前へ移動する。
+     */
+    func moveCurrentImageBackward() {
+        guard canMoveBackward else {
+            return
+        }
+
+        images.swapAt(
+            imageIndex,
+            imageIndex - 1
+        )
+
+        imageIndex -= 1
+    }
+
+    /*
+     現在の画像を一つ後ろへ移動する。
+     */
+    func moveCurrentImageForward() {
+        guard canMoveForward else {
+            return
+        }
+
+        images.swapAt(
+            imageIndex,
+            imageIndex + 1
+        )
+
+        imageIndex += 1
     }
 }

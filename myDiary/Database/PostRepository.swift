@@ -71,7 +71,7 @@ final class PostRepository {
             let postID = db.lastInsertedRowID
 
             for (index, image) in post.images.enumerated() {
-                var imageRecord = ImageRecord(
+                let imageRecord = ImageRecord(
                     id: nil,
                     postId: postID,
                     baseName: image.baseName,
@@ -85,7 +85,7 @@ final class PostRepository {
             }
 
             for (index, link) in post.links.enumerated() {
-                var linkRecord = PostLinkRecord(
+                let linkRecord = PostLinkRecord(
                     id: nil,
                     fromPostId: postID,
                     toPostId: link.toPostId,
@@ -123,7 +123,7 @@ final class PostRepository {
         db: Database
     ) throws {
 
-        var postRecord = PostRecord(
+        let postRecord = PostRecord(
             id: post.id,
             packagePostID: post.packagePostID,
             body: post.body,
@@ -151,7 +151,7 @@ final class PostRepository {
         for (index, link) in
             post.links.enumerated()
         {
-            var record = PostLinkRecord(
+            let record = PostLinkRecord(
                 id: nil,
                 fromPostId: post.id,
                 toPostId: link.toPostId,
@@ -177,7 +177,7 @@ final class PostRepository {
         for (index, image) in
             post.images.enumerated()
         {
-            var imageRecord = ImageRecord(
+            let imageRecord = ImageRecord(
                 id: nil,
                 postId: post.id,
                 baseName: image.baseName,

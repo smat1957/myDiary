@@ -17,6 +17,7 @@ struct TimelineView: View {
     let onClearFocusedPost: () -> Void
 
     let onDeleteImage: (DiaryPost, DiaryImage) -> Void
+    let onUpdateImageOrder: (DiaryPost) -> Void
     let onDeletePost: (DiaryPost) -> Void
     let onEditPost: (DiaryPost) -> Void
     let onCreateLink: (DiaryPost, DiaryPost) -> Void
@@ -177,8 +178,23 @@ struct TimelineView: View {
         .sheet(item: $viewerState) { state in
             ImageViewerView(
                 state: state,
-                onDelete: { image in
-                    onDeleteImage(state.post, image)
+
+                onDelete: {
+                    post,
+                    image in
+
+                    onDeleteImage(
+                        post,
+                        image
+                    )
+                },
+
+                onUpdateImageOrder: {
+                    updatedPost in
+
+                    onUpdateImageOrder(
+                        updatedPost
+                    )
                 }
             )
         }
