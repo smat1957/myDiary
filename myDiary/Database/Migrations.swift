@@ -114,6 +114,37 @@ enum Migrations {
                 )
             }
         }
+        migrator.registerMigration("005_CreateCachedImages") { db in
+
+            try db.create(table: "cached_images") { t in
+                t.autoIncrementedPrimaryKey("id")
+
+                t.column("sourceType", .text)
+                    .notNull()
+
+                t.column("sourceURL", .text)
+                    .notNull()
+
+                t.column("baseName", .text)
+                    .notNull()
+
+                t.column("originalExtension", .text)
+                    .notNull()
+
+                t.column("createdAt", .datetime)
+                    .notNull()
+            }
+
+            /*
+             同じURLの画像を重複してキャッシュしない。
+             */
+            try db.create(
+                index: "cached_images_on_sourceURL",
+                on: "cached_images",
+                columns: ["sourceURL"],
+                options: .unique
+            )
+        }
         
         try migrator.migrate(dbQueue)
     }

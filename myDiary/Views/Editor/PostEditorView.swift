@@ -135,7 +135,6 @@ struct PostEditorView: View {
                                 selectedImages.removeAll {
                                     $0.baseName == deletedImage.baseName
                                 }
-                                ImageStore.shared.delete(deletedImage)
                             },
                             
                             onOpenSource: { image in
@@ -294,15 +293,40 @@ struct PostEditorView: View {
 
             Task {
                 do {
-                    let image = try await ImageStore.shared.importYoutubeThumbnail(
-                        from: url
-                    )
+                    let image = try await ImageStore.shared
+                        .importYoutubeThumbnail(
+                            from: url
+                        )
 
                     await MainActor.run {
                         selectedImages.insert(image, at: 0)
                     }
+
                 } catch {
-                    print("YouTubeサムネイル取得失敗:", error)
+                    print(
+                        "YouTubeサムネイル取得失敗。"
+                        + "OGP画像を試します:",
+                        error
+                    )
+
+                    do {
+                        let image = try await ImageStore.shared
+                            .importLinkPreview(
+                                from: url,
+                                date: Date()
+                            )
+
+                        await MainActor.run {
+                            selectedImages.insert(image, at: 0)
+                        }
+
+                    } catch {
+                        print(
+                            "YouTube OGP画像取得失敗:",
+                            url.absoluteString,
+                            error.localizedDescription
+                        )
+                    }
                 }
             }
         }
@@ -339,7 +363,13 @@ struct PostEditorView: View {
             else {
                 continue
             }
-
+            // YouTube は detectYouTubeURL() が処理する。
+            // サムネイル取得に失敗した場合は、
+            // detectYouTubeURL() 内でOGP画像へフォールバックする。
+            if YouTubeHelper.videoID(from: url) != nil {
+                continue
+            }
+            
             let key = Self.normalizedURLKey(url)
 
             guard !importedLinkURLs.contains(key) else {

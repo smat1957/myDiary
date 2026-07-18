@@ -7,6 +7,7 @@
 
 import Foundation
 import AppKit
+import GRDB
 
 enum ImageKind {
     case original
@@ -117,12 +118,25 @@ final class ImageStore {
         from pageURL: URL,
         date: Date = Date()
     ) async throws -> DiaryImage {
-                
-        guard let imageURL = try await LinkPreviewHelper.ogImageURL(from: pageURL) else {
+
+        if let cachedImage = try loadCachedImage(
+            sourceURL: pageURL
+        ) {
+            return cachedImage
+        }
+
+        guard let imageURL =
+            try await LinkPreviewHelper.ogImageURL(
+                from: pageURL
+            )
+        else {
             throw NSError(
                 domain: "ImageStore",
                 code: 20,
-                userInfo: [NSLocalizedDescriptionKey: "OGP画像が見つかりません"]
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "OGP画像が見つかりません"
+                ]
             )
         }
 
@@ -132,16 +146,26 @@ final class ImageStore {
         )
 
         defer {
-            try? FileManager.default.removeItem(at: tempURL)
+            try? FileManager.default.removeItem(
+                at: tempURL
+            )
         }
 
-        return try importPreparedImage(
+        let image = try importPreparedImage(
             from: tempURL,
             originalExtension: "jpg",
             sourceType: .link,
             sourceURLForRecord: pageURL,
             date: date
         )
+
+        try saveCachedImage(
+            sourceType: .link,
+            sourceURL: pageURL.absoluteString,
+            image: image
+        )
+
+        return image
     }
 
     // MARK: - URL
@@ -173,7 +197,113 @@ final class ImageStore {
             at: url(for: image, kind: .thumbnail)
         )
     }
+    
+    // MARK: - Cached images
+    func loadCachedImage(
+        sourceURL: URL
+    ) throws -> DiaryImage? {
 
+        guard let record = try findCachedImage(
+            sourceURL: sourceURL.absoluteString
+        ) else {
+            return nil
+        }
+
+        guard let sourceType = ImageSourceType(
+            rawValue: record.sourceType
+        ) else {
+            return nil
+        }
+
+        let image = DiaryImage(
+            baseName: record.baseName,
+            originalExtension: record.originalExtension,
+            sourceType: sourceType,
+            sourceURL: URL(string: record.sourceURL)
+        )
+
+        let originalURL = url(
+            for: image,
+            kind: .original
+        )
+        
+        guard FileManager.default.fileExists(
+            atPath: originalURL.path
+        ) else {
+            try deleteCachedImage(
+                sourceURL: record.sourceURL
+            )
+            return nil
+        }
+
+        return image
+    }
+    
+    func findCachedImage(
+        sourceURL: String
+    ) throws -> CachedImageRecord? {
+
+        try DatabaseManager.shared.dbQueue.read { db in
+            try CachedImageRecord
+                .filter(Column("sourceURL") == sourceURL)
+                .fetchOne(db)
+        }
+    }
+
+    func saveCachedImage(
+        sourceType: ImageSourceType,
+        sourceURL: String,
+        image: DiaryImage
+    ) throws {
+
+        try DatabaseManager.shared.dbQueue.write { db in
+
+            let existingRecord = try CachedImageRecord
+                .filter(Column("sourceURL") == sourceURL)
+                .fetchOne(db)
+
+            guard existingRecord == nil else {
+                return
+            }
+
+            var record = CachedImageRecord(
+                id: nil,
+                sourceType: sourceType.rawValue,
+                sourceURL: sourceURL,
+                baseName: image.baseName,
+                originalExtension: image.originalExtension,
+                createdAt: Date()
+            )
+
+            try record.insert(db)
+        }
+    }
+
+    func deleteCachedImage(
+        sourceURL: String
+    ) throws {
+
+        try DatabaseManager.shared.dbQueue.write { db in
+            _ = try CachedImageRecord
+                .filter(Column("sourceURL") == sourceURL)
+                .deleteAll(db)
+        }
+    }
+    
+    func findCachedLinkImage(
+        for url: URL,
+        in images: [DiaryImage]
+    ) -> DiaryImage? {
+
+        let key = normalizedURLKey(url)
+
+        return images.first {
+
+            $0.sourceType == .link
+            && $0.sourceURL.map(normalizedURLKey) == key
+        }
+    }
+    
     // MARK: - Core import
 
     private func importPreparedImage(
@@ -384,7 +514,23 @@ final class ImageStore {
     }
     
     // MARK: - Utilities
+    
+    private func normalizedURLKey(_ url: URL) -> String {
 
+        var components = URLComponents(
+            url: url,
+            resolvingAgainstBaseURL: false
+        )
+
+        components?.fragment = nil
+
+        return components?
+            .url?
+            .absoluteString
+            .lowercased()
+            ?? url.absoluteString.lowercased()
+    }
+    
     private func makeBaseName(date: Date) -> String {
         let calendar = Calendar.current
         let year = calendar.component(.year, from: date)
