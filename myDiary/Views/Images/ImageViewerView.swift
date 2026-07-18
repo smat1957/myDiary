@@ -353,59 +353,52 @@ struct ImageViewerView: View {
     // MARK: - Source button
 
     @ViewBuilder
-    private var sourceButton:
-        some View
-    {
-        switch state.image.sourceType {
+    private var sourceButton: some View {
+        if state.hasImages {
+            switch state.image.sourceType {
 
-        case .youtube:
-            Button {
-                if let url =
-                    state.image.sourceURL
-                {
-                    NSWorkspace.shared.open(
-                        url
+            case .youtube:
+                Button {
+                    if let url = state.image.sourceURL {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Image(
+                        systemName: "play.circle.fill"
                     )
-                }
-            } label: {
-                Image(
-                    systemName:
-                        "play.circle.fill"
-                )
-                .font(
-                    .system(size: 36)
-                )
-                .foregroundStyle(.white)
-                .shadow(radius: 3)
-            }
-            .buttonStyle(.plain)
-
-        case .link:
-            Button {
-                if let url =
-                    state.image.sourceURL
-                {
-                    NSWorkspace.shared.open(
-                        url
+                    .font(
+                        .system(size: 36)
                     )
+                    .foregroundStyle(.white)
+                    .shadow(radius: 3)
                 }
-            } label: {
-                Image(
-                    systemName: "globe"
-                )
-                .font(
-                    .system(size: 32)
-                )
-                .foregroundStyle(.white)
-                .shadow(radius: 3)
-            }
-            .buttonStyle(.plain)
+                .buttonStyle(.plain)
 
-        case .photo, .generated:
+            case .link:
+                Button {
+                    if let url = state.image.sourceURL {
+                        NSWorkspace.shared.open(url)
+                    }
+                } label: {
+                    Image(
+                        systemName: "globe"
+                    )
+                    .font(
+                        .system(size: 32)
+                    )
+                    .foregroundStyle(.white)
+                    .shadow(radius: 3)
+                }
+                .buttonStyle(.plain)
+
+            case .photo, .generated:
+                EmptyView()
+            }
+        } else {
             EmptyView()
         }
     }
-
+    
     // MARK: - Image loading
 
     private func loadCurrentImage() {

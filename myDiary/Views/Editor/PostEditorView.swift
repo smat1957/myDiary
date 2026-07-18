@@ -103,6 +103,8 @@ struct PostEditorView: View {
                     if !selectedImages.isEmpty {
                         ImageGridView(
                             images: selectedImages,
+                            allowsDeletion: true,
+                            
                             onTapImage: { image in
                                 switch image.sourceType {
 
@@ -128,12 +130,14 @@ struct PostEditorView: View {
                                     }
                                 }
                             },
+                            
                             onDelete: { deletedImage in
                                 selectedImages.removeAll {
                                     $0.baseName == deletedImage.baseName
                                 }
                                 ImageStore.shared.delete(deletedImage)
                             },
+                            
                             onOpenSource: { image in
                                 if let url = image.sourceURL {
                                     NSWorkspace.shared.open(url)
@@ -247,8 +251,25 @@ struct PostEditorView: View {
     }
     
     private static func normalizedURLKey(_ url: URL) -> String {
-        var value = url.absoluteString
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard var components = URLComponents(
+            url: url,
+            resolvingAgainstBaseURL: false
+        ) else {
+            return url.absoluteString
+        }
+
+        // scheme, host は小文字へ
+        components.scheme = components.scheme?.lowercased()
+        components.host = components.host?.lowercased()
+
+        // "/" は空にする
+        if components.path == "/" {
+            components.path = ""
+        }
+
+        // 末尾の ? や & を除去
+        var value = components.string ?? url.absoluteString
 
         while value.hasSuffix("?") || value.hasSuffix("&") {
             value.removeLast()
@@ -347,9 +368,6 @@ struct PostEditorView: View {
                         error.localizedDescription
                     )
 
-                    await MainActor.run {
-                        importedLinkURLs.remove(key)
-                    }
                 }
             }
         }

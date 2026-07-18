@@ -12,7 +12,10 @@ struct ImageGridView: View {
 
     let images: [DiaryImage]
     var scale: CGFloat = 1.0
-    
+
+    // 投稿編集画面でだけ true にする
+    var allowsDeletion: Bool = false
+
     let onTapImage: (DiaryImage) -> Void
     let onDelete: (DiaryImage) -> Void
     let onOpenSource: (DiaryImage) -> Void
@@ -346,9 +349,16 @@ struct ImageGridView: View {
                         )
                         .clipped()
 
-                    sourceButton(
-                        for: image
-                    )
+                    VStack {
+                        HStack {
+                            sourceButton(for: image)
+                            Spacer()
+                            if allowsDeletion {
+                                deleteButton(for: image)
+                            }
+                        }
+                        Spacer()
+                    }
 
                     if let remainingCount,
                        remainingCount > 0 {
@@ -455,5 +465,31 @@ struct ImageGridView: View {
         case .photo, .generated:
             EmptyView()
         }
+    }
+    
+    @ViewBuilder
+    private func deleteButton(
+        for image: DiaryImage
+    ) -> some View {
+
+        Button {
+            onDelete(image)
+        } label: {
+            Image(systemName: "xmark.circle.fill")
+                .font(.system(size: 28, weight: .bold))
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(.white, .black.opacity(0.75))
+            /*
+            Image(systemName: "xmark.circle.fill")
+                .font(.system(size: 24))
+                .foregroundStyle(.white)
+                .background(
+                    Circle()
+                        .fill(.black.opacity(0.55))
+                )
+            */
+        }
+        .buttonStyle(.plain)
+        .padding(8)
     }
 }
