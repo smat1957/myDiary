@@ -249,7 +249,16 @@ final class ImageStore {
                 .fetchOne(db)
         }
     }
+    
+    func hasCachedImage(
+        sourceURL: URL
+    ) -> Bool {
 
+        (try? findCachedImage(
+            sourceURL: sourceURL.absoluteString
+        )) != nil
+    }
+    
     func saveCachedImage(
         sourceType: ImageSourceType,
         sourceURL: String,

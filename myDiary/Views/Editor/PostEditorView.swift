@@ -26,6 +26,7 @@ struct PostEditorView: View {
     @State private var viewerState: ImageViewerState?
     @State private var importedYouTubeURLs: Set<String> = []
     @State private var importedLinkURLs: Set<String> = []
+    @State private var createdCachedImages: [DiaryImage] = []
     
     init(
         vm: TimelineViewModel,
@@ -168,6 +169,7 @@ struct PostEditorView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("キャンセル") {
+                        cleanupUnusedCachedImages()
                         dismiss()
                     }
                 }
@@ -188,6 +190,7 @@ struct PostEditorView: View {
                             )
                             vm.addPost(post)
                         }
+                        cleanupUnusedCachedImages()
                         dismiss()
                     }
                     .disabled(
@@ -257,6 +260,34 @@ struct PostEditorView: View {
 
             case .failure(let error):
                 print("画像選択エラー:", error)
+            }
+        }
+    }
+    
+    private func cleanupUnusedCachedImages() {
+        // TODO:
+        // cleanupUnusedCachedImages() の動作は
+        // デバッグログまたはユニットテストで後日確認する
+        //print("cleanup:", image.baseName)
+        //print("cached image removed:", sourceURL.absoluteString)
+        //print(createdCachedImages.count)
+
+        let used = Set(
+            selectedImages.map(\.baseName)
+        )
+
+        for image in createdCachedImages {
+
+            guard !used.contains(image.baseName) else {
+                continue
+            }
+
+            ImageStore.shared.delete(image)
+
+            if let sourceURL = image.sourceURL {
+                try? ImageStore.shared.deleteCachedImage(
+                    sourceURL: sourceURL.absoluteString
+                )
             }
         }
     }
@@ -363,7 +394,27 @@ struct PostEditorView: View {
                         )
 
                         do {
+                            let alreadyCached =
+                                ImageStore.shared.hasCachedImage(
+                                    sourceURL: url
+                                )
 
+                            let image =
+                                try await ImageStore.shared
+                                    .importLinkPreview(
+                                        from: url,
+                                        date: Date()
+                                    )
+
+                            await MainActor.run {
+
+                                if !alreadyCached {
+                                    createdCachedImages.append(image)
+                                }
+
+                                selectedImages.append(image)
+                            }
+                            /*
                             let image =
                                 try await ImageStore.shared
                                     .importLinkPreview(
@@ -377,7 +428,7 @@ struct PostEditorView: View {
                                     at: 0
                                 )
                             }
-
+                             */
                         } catch {
 
                             print(

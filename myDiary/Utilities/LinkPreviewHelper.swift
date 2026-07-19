@@ -20,7 +20,7 @@ enum LinkPreviewHelper {
             YouTubeHelper.videoID(from: url) == nil
         }
     }
-
+    
     static func ogImageURL(from pageURL: URL) async throws -> URL? {
         let (data, response) = try await URLSession.shared.data(from: pageURL)
 
@@ -35,7 +35,60 @@ enum LinkPreviewHelper {
 
         return extractOGImageURL(fromHTML: html, baseURL: pageURL)
     }
+    
+    private static func extractOGImageURL(
+        fromHTML html: String,
+        baseURL: URL
+    ) -> URL? {
 
+        let patterns = [
+
+            // Open Graph
+            #"<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["'][^>]*>"#,
+            #"<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["'][^>]*>"#,
+
+            // Twitter Card
+            #"<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["'][^>]*>"#,
+            #"<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["'][^>]*>"#,
+
+            #"<meta[^>]+property=["']twitter:image["'][^>]+content=["']([^"']+)["'][^>]*>"#,
+            #"<meta[^>]+content=["']([^"']+)["'][^>]+property=["']twitter:image["'][^>]*>"#,
+
+            // 古い Twitter Card
+            #"<meta[^>]+name=["']twitter:image:src["'][^>]+content=["']([^"']+)["'][^>]*>"#,
+            #"<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image:src["'][^>]*>"#,
+
+            // image_src
+            #"<link[^>]+rel=["']image_src["'][^>]+href=["']([^"']+)["'][^>]*>"#,
+            #"<link[^>]+href=["']([^"']+)["'][^>]+rel=["']image_src["'][^>]*>"#,
+
+            // favicon
+            #"<link[^>]+rel=["'][^"']*icon[^"']*["'][^>]+href=["']([^"']+)["'][^>]*>"#,
+            #"<link[^>]+href=["']([^"']+)["'][^>]+rel=["'][^"']*icon[^"']*["'][^>]*>"#
+        ]
+
+        for pattern in patterns {
+
+            if let value = firstCapture(
+                in: html,
+                pattern: pattern
+            ) {
+
+                return URL(
+                    string: value,
+                    relativeTo: baseURL
+                )?.absoluteURL
+            }
+        }
+
+        // 最後の保険
+        return URL(
+            string: "/favicon.ico",
+            relativeTo: baseURL
+        )?.absoluteURL
+    }
+    
+    /*
     private static func extractOGImageURL(
         fromHTML html: String,
         baseURL: URL
@@ -56,7 +109,8 @@ enum LinkPreviewHelper {
 
         return nil
     }
-
+     */
+    
     private static func firstCapture(
         in text: String,
         pattern: String
