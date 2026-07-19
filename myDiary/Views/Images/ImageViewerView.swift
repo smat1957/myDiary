@@ -53,7 +53,8 @@ struct ImageViewerView: View {
 
             } else {
                 ContentUnavailableView(
-                    "画像を読み込めません",
+                    //"画像を読み込めません",
+                    String(localized: "image.cannotLoad"),
                     systemImage: "photo"
                 )
             }
@@ -90,18 +91,21 @@ struct ImageViewerView: View {
             loadCurrentImage()
         }
         .alert(
-            "この画像を削除しますか？",
+            //"この画像を削除しますか？",
+            String(localized: "image.delete.confirm.title"),
             isPresented:
                 $showingDeleteAlert
         ) {
             Button(
-                "キャンセル",
+                //"キャンセル",
+                String(localized: "common.cancel"),
                 role: .cancel
             ) {
             }
 
             Button(
-                "削除",
+                //"削除",
+                String(localized: "common.delete"),
                 role: .destructive
             ) {
                 deleteCurrentImage()
@@ -109,7 +113,8 @@ struct ImageViewerView: View {
 
         } message: {
             Text(
-                "この投稿から画像を削除します。"
+                String(localized: "image.delete.confirm.message")
+                //"この投稿から画像を削除します。"
             )
         }
     }
@@ -126,7 +131,8 @@ struct ImageViewerView: View {
             .disabled(
                 !state.hasPrevious
             )
-            .help("先頭の画像")
+            .help(String(localized: "viewer.first.help"))
+            //.help("先頭の画像")
 
             // 前の画像
             Button {
@@ -140,7 +146,8 @@ struct ImageViewerView: View {
             .disabled(
                 !state.hasPrevious
             )
-            .help("前の画像")
+            .help(String(localized: "viewer.previous.help"))
+            //.help("前の画像")
 
             // 現在位置
             Text(
@@ -166,7 +173,8 @@ struct ImageViewerView: View {
             .disabled(
                 !state.hasNext
             )
-            .help("次の画像")
+            .help(String(localized: "viewer.next.help"))
+            //.help("次の画像")
 
             // 最後の画像
             Button("≫") {
@@ -175,7 +183,8 @@ struct ImageViewerView: View {
             .disabled(
                 !state.hasNext
             )
-            .help("最後の画像")
+            .help(String(localized: "viewer.last.help"))
+            //.help("最後の画像")
 
             Divider()
                 .frame(height: 22)
@@ -184,8 +193,10 @@ struct ImageViewerView: View {
              Display / Original
              プルダウンメニュー
              */
+            /*
             Picker(
-                "表示画像",
+                //"表示画像",
+                String(localized: "viewer.imageKind"),
                 selection:
                     Bindable(state)
                         .viewerImageKind
@@ -198,11 +209,27 @@ struct ImageViewerView: View {
                         .tag(kind)
                 }
             }
+             */
+            Picker(
+                String(localized: "viewer.imageKind"),
+                selection: Bindable(state).viewerImageKind
+            ) {
+                Picker(
+                    String(localized: "viewer.imageKind"),
+                    selection: Bindable(state).viewerImageKind
+                ) {
+                    ForEach(ViewerImageKind.allCases) { kind in
+                        Text(kind.localizedName)
+                            .tag(kind)
+                    }
+                }
+            }
             .pickerStyle(.menu)
             .labelsHidden()
             .frame(width: 110)
             .help(
-                "Display画像またはOriginal画像を表示"
+                String(localized: "viewer.imageKind.help")
+                //"Display画像またはOriginal画像を表示"
             )
 
             Spacer()
@@ -215,14 +242,16 @@ struct ImageViewerView: View {
                     systemName: "minus"
                 )
             }
-            .help("縮小")
+            .help(String(localized: "viewer.zoomOut"))
+            //.help("縮小")
 
             // Fit
             Button("Fit") {
                 fitImage()
             }
             .help(
-                "ウインドウに合わせる"
+                String(localized: "viewer.fit.help")
+                //"ウインドウに合わせる"
             )
 
             // 拡大
@@ -233,7 +262,8 @@ struct ImageViewerView: View {
                     systemName: "plus"
                 )
             }
-            .help("拡大")
+            .help(String(localized: "viewer.zoomIn"))
+            //.help("拡大")
 
             Spacer()
 
@@ -241,21 +271,23 @@ struct ImageViewerView: View {
             Button("Finder") {
                 revealCurrentImageInFinder()
             }
-            .help(
-                "Finderで表示"
-            )
+            .help(String(localized: "viewer.finder.help"))
+            //.help("Finderで表示")
 
             // 削除
             Button(
-                "削除",
+                String(localized: "common.delete"),
+                //"削除",
                 role: .destructive
             ) {
                 showingDeleteAlert = true
             }
-            .help("画像を削除")
+            .help(String(localized: "image.delete.help"))
+            //.help("画像を削除")
 
             // 閉じる
-            Button("閉じる") {
+            //Button("閉じる") {
+            Button(String(localized: "common.close")) {
                 dismiss()
             }
             .keyboardShortcut(
@@ -320,14 +352,16 @@ struct ImageViewerView: View {
     private var imageContextMenu:
         some View
     {
-        Button("前へ移動") {
+        //Button("前へ移動") {
+        Button(String(localized: "image.moveBackward")) {
             moveCurrentImageBackward()
         }
         .disabled(
             !state.canMoveBackward
         )
 
-        Button("後ろへ移動") {
+        //Button("後ろへ移動") {
+        Button(String(localized: "image.moveForward")) {
             moveCurrentImageForward()
         }
         .disabled(
@@ -336,14 +370,16 @@ struct ImageViewerView: View {
 
         Divider()
 
-        Button("Finderで表示") {
+        //Button("Finderで表示") {
+        Button(String(localized: "viewer.finder")) {
             revealCurrentImageInFinder()
         }
 
         Divider()
 
         Button(
-            "削除",
+            //"削除",
+            String(localized: "common.delete"),
             role: .destructive
         ) {
             showingDeleteAlert = true

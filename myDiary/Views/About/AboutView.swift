@@ -62,7 +62,7 @@ and related posts on your own Mac.
                 Label("Full-text search", systemImage: "magnifyingglass")
 
                 Label(
-                    "Diary Package Import / Export",
+                    "Portable Diary Package Import / Export",
                     systemImage: "square.and.arrow.down"
                 )
 

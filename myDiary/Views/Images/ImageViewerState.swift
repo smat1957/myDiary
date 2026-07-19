@@ -8,7 +8,9 @@
 import Foundation
 import AppKit
 import Observation
+import SwiftUI
 
+/*
 enum ViewerImageKind:
     String,
     CaseIterable,
@@ -19,6 +21,25 @@ enum ViewerImageKind:
 
     var id: Self {
         self
+    }
+}
+*/
+
+enum ViewerImageKind: String, CaseIterable, Identifiable {
+
+    case display
+    case original
+
+    var id: Self { self }
+
+    var localizedName: LocalizedStringKey {
+        switch self {
+        case .display:
+            return "viewer.imageKind.display"
+
+        case .original:
+            return "viewer.imageKind.original"
+        }
     }
 }
 

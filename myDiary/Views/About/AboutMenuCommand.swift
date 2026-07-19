@@ -14,7 +14,8 @@ struct AboutMenuCommand: View {
 
     var body: some View {
 
-        Button("About myDiary") {
+        //Button("About myDiary")
+        Button(String(localized: "about.menu")) {
             openWindow(id: "about")
         }
     }

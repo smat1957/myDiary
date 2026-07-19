@@ -139,7 +139,8 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "square.and.arrow.down")
                     }
-                    .help("Diary Packageを読み込む")
+                    .help(String(localized: "package.import.help"))
+                    //.help("Diary Packageを読み込む")
 
                     Button {
                         folderSelectionPurpose = .exportPackage
@@ -147,7 +148,8 @@ struct ContentView: View {
                     } label: {
                         Image(systemName: "square.and.arrow.up")
                     }
-                    .help("Diary Packageを書き出す")
+                    .help(String(localized: "package.export.help"))
+                    //.help("Diary Packageを書き出す")
 
                     Button {
                         showingSearch = true
@@ -156,14 +158,16 @@ struct ContentView: View {
                             systemName: "magnifyingglass"
                         )
                     }
-                    .help("投稿を検索")
+                    .help(String(localized: "post.search.help"))
+                    //.help("投稿を検索")
                     
                     Button {
                         showingEditor = true
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .help("新しい投稿")
+                    .help(String(localized: "post.new.help"))
+                    //.help("新しい投稿")
                     
                     //Button {
                     //    openWindow(id: "about")
@@ -244,23 +248,26 @@ struct ContentView: View {
                 switch purpose {
 
                 case .importPackage:
-                    importMessage = """
-                    フォルダ選択に失敗しました。
-
-                    \(error.localizedDescription)
-                    """
+                    importMessage = String(localized: "package.import.folderSelectionFailed")
+                    //"""
+                    //フォルダ選択に失敗しました。
+                    //
+                    //\(error.localizedDescription)
+                    //"""
 
                 case .exportPackage:
-                    exportMessage = """
-                    書き出し先フォルダの選択に失敗しました。
-
-                    \(error.localizedDescription)
-                    """
+                    exportMessage = String(localized: "package.export.folderSelectionFailed")
+                    //"""
+                    //書き出し先フォルダの選択に失敗しました。
+                    //
+                    //\(error.localizedDescription)
+                    //"""
                 }
             }
         }
         .alert(
-            "インポート",
+            //"インポート",
+            String(localized: "package.import.title"),
             isPresented: Binding(
                 get: { importMessage != nil },
                 set: { if !$0 { importMessage = nil } }
@@ -273,7 +280,8 @@ struct ContentView: View {
             Text(importMessage ?? "")
         }
         .alert(
-            "エクスポート",
+            //"エクスポート",
+            String(localized: "package.export.title"),
             isPresented: Binding(
                 get: {
                     exportMessage != nil

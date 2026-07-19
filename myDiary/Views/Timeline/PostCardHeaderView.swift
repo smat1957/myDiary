@@ -44,7 +44,8 @@ struct PostCardHeaderView: View {
                 onLinkComment(post)
             } label: {
                 Label(
-                    "親投稿に紐付ける",
+                    //"親投稿に紐付ける",
+                    String(localized: "post.linkToParent"),
                     systemImage:
                         "arrow.turn.down.right"
                 )
@@ -56,13 +57,15 @@ struct PostCardHeaderView: View {
                 onReplyPost(post)
             } label: {
                 Label(
-                    "返信",
+                    //"返信",
+                    String(localized: "post.reply"),
                     systemImage:
                         "arrowshape.turn.up.left"
                 )
             }
             .buttonStyle(.plain)
-            .help("コメントを追加")
+            .help(String(localized: "post.reply.help"))
+            //.help("コメントを追加")
 
             Button {
                 onOpenViewer(post)
@@ -73,18 +76,21 @@ struct PostCardHeaderView: View {
                 )
             }
             .buttonStyle(.plain)
-            .help("画像一覧を開く")
+            .help(String(localized: "viewer.open.help"))
+            //.help("画像一覧を開く")
 
             Button {
                 onLinkPost(post)
             } label: {
                 Label(
-                    "関連記事を追加",
+                    //"関連記事を追加",
+                    String(localized: "post.addRelated"),
                     systemImage: "link"
                 )
             }
             .buttonStyle(.plain)
-            .help("関連投稿を追加")
+            .help(String(localized: "post.addRelated.help"))
+            //.help("関連投稿を追加")
 
             Button {
                 onEditPost(post)
@@ -94,7 +100,8 @@ struct PostCardHeaderView: View {
                 )
             }
             .buttonStyle(.plain)
-            .help("投稿を編集")
+            .help(String(localized: "editor.edit.help"))
+            //.help("投稿を編集")
 
             Button {
                 onDeletePost(post)
@@ -104,7 +111,8 @@ struct PostCardHeaderView: View {
                 )
             }
             .buttonStyle(.plain)
-            .help("投稿を削除")
+            .help(String(localized: "common.delete.help"))
+            //.help("投稿を削除")
         }
     }
 }

@@ -28,8 +28,11 @@ struct ImageGridView: View {
 
             VStack(alignment: .leading, spacing: 8) {
 
-                Text("画像 \(images.count) 枚")
-
+                //Text("画像 \(images.count) 枚")
+                Text(
+                    String(localized: "images.count")
+                )
+                
                 switch images.count {
 
                 case 0:
@@ -405,7 +408,8 @@ struct ImageGridView: View {
 
         } else {
 
-            Text("読み込み失敗")
+            //Text("読み込み失敗")
+            Text(String(localized: "image.loadFailed"))
                 .frame(
                     width: width,
                     height: height
@@ -461,6 +465,7 @@ struct ImageGridView: View {
                 .padding(8)
             }
             .buttonStyle(.plain)
+            .help(String(localized: "image.openSource"))
 
         case .photo, .generated:
             EmptyView()
@@ -490,6 +495,7 @@ struct ImageGridView: View {
             */
         }
         .buttonStyle(.plain)
+        .help(String(localized: "common.delete"))
         .padding(8)
     }
 }

@@ -36,7 +36,8 @@ struct RelatedPostsSectionView: View {
 
             Divider()
 
-            Text("関連投稿")
+            //Text("関連投稿")
+            Text(String(localized: "related.title"))
                 .font(.headline)
 
             ForEach(
@@ -135,7 +136,8 @@ struct RelatedPostsSectionView: View {
             }
             .buttonStyle(.plain)
             .disabled(index == 0)
-            .help("上へ移動")
+            .help(String(localized: "common.moveUp"))
+            //.help("上へ移動")
 
             Button {
                 onMoveLink(
@@ -152,7 +154,8 @@ struct RelatedPostsSectionView: View {
                 index
                     == post.links.count - 1
             )
-            .help("下へ移動")
+            .help(String(localized: "common.moveDown"))
+            //.help("下へ移動")
 
             Button {
                 onDeleteLink(
@@ -165,7 +168,8 @@ struct RelatedPostsSectionView: View {
                 )
             }
             .buttonStyle(.plain)
-            .help("関連投稿から削除")
+            .help(String(localized: "related.remove"))
+            //.help("関連投稿から削除")
         }
         .padding(.vertical, 3)
     }
@@ -183,7 +187,10 @@ struct RelatedPostsSectionView: View {
             .foregroundStyle(.secondary)
 
             Text(
-                "投稿 ID \(targetPostID) が見つかりません"
+                String(
+                        localized: "related.missing \(targetPostID)"
+                    )
+                //"投稿 ID \(targetPostID) が見つかりません"
             )
             .font(.caption)
             .foregroundStyle(.secondary)
@@ -215,7 +222,8 @@ struct RelatedPostsSectionView: View {
             )
 
         if trimmed.isEmpty {
-            return "本文なし"
+            return String(localized: "post.noBody")
+            //return "本文なし"
         }
 
         return trimmed.replacingOccurrences(

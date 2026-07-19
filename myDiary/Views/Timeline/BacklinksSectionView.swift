@@ -29,7 +29,8 @@ struct BacklinksSectionView: View {
             Divider()
 
             Text(
-                "この投稿を参照している投稿"
+                String(localized: "backlinks.title")
+                //"この投稿を参照している投稿"
             )
             .font(.headline)
 
@@ -101,7 +102,8 @@ struct BacklinksSectionView: View {
             )
 
         if trimmed.isEmpty {
-            return "本文なし"
+            return String(localized: "post.noBody")
+            //return "本文なし"
         }
 
         return trimmed.replacingOccurrences(

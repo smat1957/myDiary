@@ -85,9 +85,11 @@ struct PostEditorView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("本文")
+                    //Text("本文")
+                    Text(String(localized: "editor.body"))
                         .font(.headline)
                     TextEditor(text: $bodyText)
+                        .help(String(localized: "editor.body.placeholder"))
                         .frame(maxWidth: .infinity)
                         .frame(minHeight: 220)
                         .onChange(of: bodyText) { _, newValue in
@@ -110,7 +112,11 @@ struct PostEditorView: View {
                     Button {
                         showingImagePicker = true
                     } label: {
-                        Label("画像を追加", systemImage: "photo")
+                        //Label("画像を追加", systemImage: "photo")
+                        Label(
+                            String(localized: "image.add"),
+                            systemImage: "photo"
+                        )
                     }
                     
                     if !selectedImages.isEmpty {
@@ -165,17 +171,24 @@ struct PostEditorView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
             }
-            .navigationTitle(editingPost == nil ? "新しい投稿" : "投稿を編集")
+            //.navigationTitle(editingPost == nil ? "新しい投稿" : "投稿を編集")
+            .navigationTitle(
+                editingPost == nil
+                    ? String(localized: "editor.newPost")
+                    : String(localized: "editor.editPost")
+            )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") {
+                    //Button("キャンセル")
+                    Button(String(localized: "common.cancel")) {
                         cleanupUnusedCachedImages()
                         dismiss()
                     }
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
+                    //Button("保存")
+                    Button(String(localized: "common.save")) {
                         if let editingPost {
                             var updated = editingPost
                             updated.body = bodyText

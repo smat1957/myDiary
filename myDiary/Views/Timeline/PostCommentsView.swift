@@ -184,7 +184,11 @@ struct PostCommentsView: View {
                         )
 
                         Text(
-                            "コメント \(comments.count)件"
+                            String(
+                                    localized: "comments.title",
+                                    defaultValue: "Comments \(comments.count)"
+                                )
+                            //"コメント \(comments.count)件"
                         )
                         .font(.headline)
                     }
@@ -265,7 +269,8 @@ struct PostCommentsView: View {
                 Spacer()
 
                 if comment.packagePostID != nil {
-                    Text("Facebook")
+                    //Text("Facebook")
+                    Text(String(localized: "facebook.imported"))
                         .font( .system(
                             size: headerFontSize - 1
                         ))
@@ -280,7 +285,8 @@ struct PostCommentsView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .help("返信")
+                .help(String(localized: "post.reply.help"))
+                //.help("返信")
                 
                 // 画像一覧
                 if !comment.images.isEmpty {
@@ -293,7 +299,8 @@ struct PostCommentsView: View {
                         )
                     }
                     .buttonStyle(.plain)
-                    .help("画像一覧を開く")
+                    .help(String(localized: "viewer.open.help"))
+                    //.help("画像一覧を開く")
                 }
 
                 // 関連記事
@@ -305,7 +312,8 @@ struct PostCommentsView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .help("関連記事を追加")
+                .help(String(localized: "post.addRelated.help"))
+                //.help("関連記事を追加")
 
                 // 編集
                 Button {
@@ -316,7 +324,8 @@ struct PostCommentsView: View {
                     )
                 }
                 .buttonStyle(.plain)
-                .help("コメントを編集")
+                .help(String(localized: "comment.edit.help"))
+                //.help("コメントを編集")
 
                 // 親投稿との紐付け解除
                 Button {
@@ -329,7 +338,8 @@ struct PostCommentsView: View {
                     //)
                 }
                 .buttonStyle(.plain)
-                .help("親投稿との紐付けを解除")
+                .help(String(localized: "comment.unlink.help"))
+                //.help("親投稿との紐付けを解除")
             }
 
             if !comment.body

@@ -199,7 +199,8 @@ struct TimelineView: View {
             )
         }
         .alert(
-            "この投稿を削除しますか？",
+            //"この投稿を削除しますか？",
+            String(localized: "timeline.delete.title"),
             isPresented: Binding(
                 get: { pendingDeletePost != nil },
                 set: {
@@ -209,11 +210,13 @@ struct TimelineView: View {
                 }
             )
         ) {
-            Button("キャンセル", role: .cancel) {
+            //Button("キャンセル", role: .cancel) {
+            Button(String(localized: "common.cancel"), role: .cancel) {
                 pendingDeletePost = nil
             }
 
-            Button("削除", role: .destructive) {
+            //Button("削除", role: .destructive) {
+            Button(String(localized: "common.delete"), role: .destructive) {
                 if let post = pendingDeletePost {
                     onDeletePost(post)
                 }
@@ -221,7 +224,8 @@ struct TimelineView: View {
                 pendingDeletePost = nil
             }
         } message: {
-            Text("この投稿と添付画像を削除します。")
+            //Text("この投稿と添付画像を削除します。")
+            Text(String(localized: "timeline.delete.message"))
         }
         .sheet(item: $linkSourcePost) { sourcePost in
             PostLinkPickerView(
