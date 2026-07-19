@@ -90,10 +90,22 @@ struct PostEditorView: View {
                         .frame(maxWidth: .infinity)
                         .frame(minHeight: 220)
                         .onChange(of: bodyText) { _, newValue in
-                            detectYouTubeURL(in: newValue)
-                            detectLinkPreview(in: newValue)
-                        }
 
+                            let urls = detectedURLs(
+                                in: newValue
+                            )
+
+                            detectURLs(urls)
+                        }
+                    /* このonChangeはコメントのまま残しておく
+                        .onChange(of: bodyText) { _, newValue in
+
+                            let urls = detectedURLs(in: newValue)
+
+                            detectYouTubeURLs(urls)
+                            detectLinkPreviews(urls)
+                        }
+                     */
                     Button {
                         showingImagePicker = true
                     } label: {
@@ -249,6 +261,29 @@ struct PostEditorView: View {
         }
     }
     
+    private func detectedURLs(
+        in text: String
+    ) -> [URL] {
+
+        guard let detector = try? NSDataDetector(
+            types: NSTextCheckingResult.CheckingType.link.rawValue
+        ) else {
+            return []
+        }
+
+        let range = NSRange(
+            text.startIndex..<text.endIndex,
+            in: text
+        )
+
+        return detector.matches(
+            in: text,
+            options: [],
+            range: range
+        )
+        .compactMap(\.url)
+    }
+    
     private static func normalizedURLKey(_ url: URL) -> String {
 
         guard var components = URLComponents(
@@ -277,15 +312,151 @@ struct PostEditorView: View {
         return value
     }
     
-    private func detectYouTubeURL(in text: String) {
-        let urls = YouTubeHelper.youtubeURLs(in: text)
+    private func detectURLs(
+        _ urls: [URL]
+    ) {
 
         for url in urls {
-            guard let videoID = YouTubeHelper.videoID(from: url) else {
+
+            guard
+                url.scheme == "http"
+                || url.scheme == "https"
+            else {
                 continue
             }
 
-            guard !importedYouTubeURLs.contains(videoID) else {
+            //
+            // YouTube
+            //
+            if let videoID = YouTubeHelper.videoID(from: url) {
+
+                guard
+                    !importedYouTubeURLs.contains(videoID)
+                else {
+                    continue
+                }
+
+                importedYouTubeURLs.insert(videoID)
+
+                Task {
+
+                    do {
+
+                        let image =
+                            try await ImageStore.shared
+                                .importYoutubeThumbnail(
+                                    from: url
+                                )
+
+                        await MainActor.run {
+                            selectedImages.insert(
+                                image,
+                                at: 0
+                            )
+                        }
+
+                    } catch {
+
+                        print(
+                            "YouTubeサムネイル取得失敗。OGP画像を試します:",
+                            error
+                        )
+
+                        do {
+
+                            let image =
+                                try await ImageStore.shared
+                                    .importLinkPreview(
+                                        from: url,
+                                        date: Date()
+                                    )
+
+                            await MainActor.run {
+                                selectedImages.insert(
+                                    image,
+                                    at: 0
+                                )
+                            }
+
+                        } catch {
+
+                            print(
+                                "YouTube OGP画像取得失敗:",
+                                url.absoluteString,
+                                error.localizedDescription
+                            )
+
+                        }
+                    }
+                }
+
+                continue
+            }
+
+            //
+            // 通常リンク
+            //
+            let key = Self.normalizedURLKey(url)
+
+            guard
+                !importedLinkURLs.contains(key)
+            else {
+                continue
+            }
+
+            importedLinkURLs.insert(key)
+
+            Task {
+
+                do {
+
+                    let image =
+                        try await ImageStore.shared
+                            .importLinkPreview(
+                                from: url,
+                                date: Date()
+                            )
+
+                    await MainActor.run {
+                        selectedImages.append(image)
+                    }
+
+                } catch {
+
+                    print(
+                        "リンク画像取得失敗:",
+                        url.absoluteString,
+                        error.localizedDescription
+                    )
+
+                }
+            }
+        }
+    }
+    
+/* この関数はコメントのまま残しておく
+    private func detectYouTubeURLs(
+        _ urls: [URL]
+    ) {
+
+        for url in urls {
+
+            guard
+                url.scheme == "http"
+                || url.scheme == "https"
+            else {
+                continue
+            }
+
+            guard
+                let videoID = YouTubeHelper.videoID(from: url)
+            else {
+                continue
+            }
+
+            guard
+                !importedYouTubeURLs.contains(videoID)
+            else {
                 continue
             }
 
@@ -303,13 +474,14 @@ struct PostEditorView: View {
                     }
 
                 } catch {
+
                     print(
-                        "YouTubeサムネイル取得失敗。"
-                        + "OGP画像を試します:",
+                        "YouTubeサムネイル取得失敗。OGP画像を試します:",
                         error
                     )
 
                     do {
+
                         let image = try await ImageStore.shared
                             .importLinkPreview(
                                 from: url,
@@ -317,45 +489,31 @@ struct PostEditorView: View {
                             )
 
                         await MainActor.run {
-                            selectedImages.insert(image, at: 0)
+                            selectedImages.insert(
+                                image,
+                                at: 0
+                            )
                         }
 
                     } catch {
+
                         print(
                             "YouTube OGP画像取得失敗:",
                             url.absoluteString,
                             error.localizedDescription
                         )
+
                     }
                 }
             }
         }
     }
-    
-    private func detectLinkPreview(in text: String) {
-
-        guard let detector = try? NSDataDetector(
-            types: NSTextCheckingResult.CheckingType.link.rawValue
-        ) else {
-            return
-        }
-
-        let range = NSRange(
-            text.startIndex..<text.endIndex,
-            in: text
-        )
-
-        let matches = detector.matches(
-            in: text,
-            options: [],
-            range: range
-        )
-
-        for match in matches {
-
-            guard let url = match.url else {
-                continue
-            }
+ 
+    //  この関数はコメントのまま残しておく
+    private func detectLinkPreviews(
+        _ urls: [URL]
+    ) {
+        for url in urls {
 
             guard
                 url.scheme == "http"
@@ -402,7 +560,7 @@ struct PostEditorView: View {
             }
         }
     }
-    
+*/
     private func firstURL(in text: String) -> URL? {
         let detector = try? NSDataDetector(
             types: NSTextCheckingResult.CheckingType.link.rawValue
