@@ -14,12 +14,139 @@
 /* Begin PBXFileReference section */
 		4048A2B32FFB271A002619D7 /* myDiary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myDiary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		40494CD7300CBEE400F73148 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		40A31540300D9DDC00832C36 /* myDiaryiPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myDiaryiPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		40A31554300DDC0300832C36 /* myDiaryiPhone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = myDiaryiPhone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		40A31613300DE4E700832C36 /* Exceptions for "Database" folder in "myDiary" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DatabaseManager.swift,
+				ImageRecord.swift,
+				Migrations.swift,
+				PostLinkRecord.swift,
+				PostRecord.swift,
+				PostRepository.swift,
+			);
+			target = 4048A2B22FFB271A002619D7 /* myDiary */;
+		};
+		40A31614300DE4E700832C36 /* Exceptions for "Export" folder in "myDiary" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DiaryExporter.swift,
+			);
+			target = 4048A2B22FFB271A002619D7 /* myDiary */;
+		};
+		40A31615300DE4E700832C36 /* Exceptions for "Import" folder in "myDiary" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DiaryArchive.swift,
+				DiaryImporter.swift,
+			);
+			target = 4048A2B22FFB271A002619D7 /* myDiary */;
+		};
+		40A31616300DE4E700832C36 /* Exceptions for "Models" folder in "myDiary" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CachedImageRecord.swift,
+				DiaryImage.swift,
+				DiaryPost.swift,
+				ImageSourceType.swift,
+				PostLink.swift,
+			);
+			target = 4048A2B22FFB271A002619D7 /* myDiary */;
+		};
+		40A31617300DE4E700832C36 /* Exceptions for "Services" folder in "myDiary" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ImageStore.swift,
+			);
+			target = 4048A2B22FFB271A002619D7 /* myDiary */;
+		};
+		40A31618300DE4E700832C36 /* Exceptions for "ViewModels" folder in "myDiary" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TimelineNavigationState.swift,
+				TimelineSearchResult.swift,
+				TimelineViewModel.swift,
+				"TimelineViewModel+Comments.swift",
+				"TimelineViewModel+Links.swift",
+				"TimelineViewModel+Navigation.swift",
+				"TimelineViewModel+Posts.swift",
+				"TimelineViewModel+Search.swift",
+			);
+			target = 4048A2B22FFB271A002619D7 /* myDiary */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		4048A2B52FFB271A002619D7 /* myDiary */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = myDiary;
+			sourceTree = "<group>";
+		};
+		40A31541300D9DDC00832C36 /* myDiaryiPad */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = myDiaryiPad;
+			sourceTree = "<group>";
+		};
+		40A31555300DDC0300832C36 /* myDiaryiPhone */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = myDiaryiPhone;
+			sourceTree = "<group>";
+		};
+		40A315E0300DE4E700832C36 /* Database */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40A31613300DE4E700832C36 /* Exceptions for "Database" folder in "myDiary" target */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		40A315E2300DE4E700832C36 /* Export */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40A31614300DE4E700832C36 /* Exceptions for "Export" folder in "myDiary" target */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+		40A315E5300DE4E700832C36 /* Import */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40A31615300DE4E700832C36 /* Exceptions for "Import" folder in "myDiary" target */,
+			);
+			path = Import;
+			sourceTree = "<group>";
+		};
+		40A315EB300DE4E700832C36 /* Models */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40A31616300DE4E700832C36 /* Exceptions for "Models" folder in "myDiary" target */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		40A315ED300DE4E700832C36 /* Services */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40A31617300DE4E700832C36 /* Exceptions for "Services" folder in "myDiary" target */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		40A315F0300DE4E700832C36 /* Utilities */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		40A315F9300DE4E700832C36 /* ViewModels */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40A31618300DE4E700832C36 /* Exceptions for "ViewModels" folder in "myDiary" target */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -33,14 +160,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		40A3153D300D9DDC00832C36 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40A31551300DDC0300832C36 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		4048A2AA2FFB2719002619D7 = {
 			isa = PBXGroup;
 			children = (
+				40A31560300DDFB300832C36 /* myDiaryCore */,
 				40494CD7300CBEE400F73148 /* Localizable.xcstrings */,
 				4048A2B52FFB271A002619D7 /* myDiary */,
+				40A31541300D9DDC00832C36 /* myDiaryiPad */,
+				40A31555300DDC0300832C36 /* myDiaryiPhone */,
 				4048A2B42FFB271A002619D7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -49,8 +193,24 @@
 			isa = PBXGroup;
 			children = (
 				4048A2B32FFB271A002619D7 /* myDiary.app */,
+				40A31540300D9DDC00832C36 /* myDiaryiPad.app */,
+				40A31554300DDC0300832C36 /* myDiaryiPhone.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		40A31560300DDFB300832C36 /* myDiaryCore */ = {
+			isa = PBXGroup;
+			children = (
+				40A315E0300DE4E700832C36 /* Database */,
+				40A315E2300DE4E700832C36 /* Export */,
+				40A315E5300DE4E700832C36 /* Import */,
+				40A315EB300DE4E700832C36 /* Models */,
+				40A315ED300DE4E700832C36 /* Services */,
+				40A315F0300DE4E700832C36 /* Utilities */,
+				40A315F9300DE4E700832C36 /* ViewModels */,
+			);
+			path = myDiaryCore;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -70,6 +230,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				4048A2B52FFB271A002619D7 /* myDiary */,
+				40A315F0300DE4E700832C36 /* Utilities */,
 			);
 			name = myDiary;
 			packageProductDependencies = (
@@ -77,6 +238,50 @@
 			);
 			productName = myDiary;
 			productReference = 4048A2B32FFB271A002619D7 /* myDiary.app */;
+			productType = "com.apple.product-type.application";
+		};
+		40A3153F300D9DDC00832C36 /* myDiaryiPad */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 40A3154A300D9DDF00832C36 /* Build configuration list for PBXNativeTarget "myDiaryiPad" */;
+			buildPhases = (
+				40A3153C300D9DDC00832C36 /* Sources */,
+				40A3153D300D9DDC00832C36 /* Frameworks */,
+				40A3153E300D9DDC00832C36 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				40A31541300D9DDC00832C36 /* myDiaryiPad */,
+			);
+			name = myDiaryiPad;
+			packageProductDependencies = (
+			);
+			productName = myDiaryiPad;
+			productReference = 40A31540300D9DDC00832C36 /* myDiaryiPad.app */;
+			productType = "com.apple.product-type.application";
+		};
+		40A31553300DDC0300832C36 /* myDiaryiPhone */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 40A3155C300DDC0600832C36 /* Build configuration list for PBXNativeTarget "myDiaryiPhone" */;
+			buildPhases = (
+				40A31550300DDC0300832C36 /* Sources */,
+				40A31551300DDC0300832C36 /* Frameworks */,
+				40A31552300DDC0300832C36 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				40A31555300DDC0300832C36 /* myDiaryiPhone */,
+			);
+			name = myDiaryiPhone;
+			packageProductDependencies = (
+			);
+			productName = myDiaryiPhone;
+			productReference = 40A31554300DDC0300832C36 /* myDiaryiPhone.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -90,6 +295,12 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					4048A2B22FFB271A002619D7 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					40A3153F300D9DDC00832C36 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					40A31553300DDC0300832C36 = {
 						CreatedOnToolsVersion = 26.3;
 					};
 				};
@@ -113,6 +324,8 @@
 			projectRoot = "";
 			targets = (
 				4048A2B22FFB271A002619D7 /* myDiary */,
+				40A3153F300D9DDC00832C36 /* myDiaryiPad */,
+				40A31553300DDC0300832C36 /* myDiaryiPhone */,
 			);
 		};
 /* End PBXProject section */
@@ -126,10 +339,38 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		40A3153E300D9DDC00832C36 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40A31552300DDC0300832C36 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4048A2AF2FFB271A002619D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40A3153C300D9DDC00832C36 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		40A31550300DDC0300832C36 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -345,6 +586,144 @@
 			};
 			name = Release;
 		};
+		40A31548300D9DDF00832C36 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 657FPAGC7T;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.matoike.personal.myDiaryiPad;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		40A31549300D9DDF00832C36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 657FPAGC7T;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.matoike.personal.myDiaryiPad;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		40A3155D300DDC0600832C36 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 657FPAGC7T;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.matoike.personal.myDiaryiPhone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		40A3155E300DDC0600832C36 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 657FPAGC7T;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.matoike.personal.myDiaryiPhone;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -362,6 +741,24 @@
 			buildConfigurations = (
 				4048A2BF2FFB2721002619D7 /* Debug */,
 				4048A2C02FFB2721002619D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		40A3154A300D9DDF00832C36 /* Build configuration list for PBXNativeTarget "myDiaryiPad" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40A31548300D9DDF00832C36 /* Debug */,
+				40A31549300D9DDF00832C36 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		40A3155C300DDC0600832C36 /* Build configuration list for PBXNativeTarget "myDiaryiPhone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				40A3155D300DDC0600832C36 /* Debug */,
+				40A3155E300DDC0600832C36 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
