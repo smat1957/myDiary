@@ -2,11 +2,11 @@
 //  ImageGridView.swift
 //  myDiary
 //
-//  Created by 的池秋成 on 2026/07/06.
+//  Created by 的池秋成 on 2026/07/20.
 //
 
 import SwiftUI
-import AppKit
+import UIKit
 
 struct ImageGridView: View {
 
@@ -342,15 +342,16 @@ struct ImageGridView: View {
             kind: .thumbnail
         )
 
-        if let nsImage = NSImage(contentsOf: url) {
-
+        //if let nsImage = NSImage(contentsOf: url) {
+        if let uiImage = UIImage(contentsOfFile: url.path) {
+            
             Button {
                 onTapImage(image)
             } label: {
 
                 ZStack(alignment: .topLeading) {
 
-                    Image(nsImage: nsImage)
+                    Image(uiImage: uiImage)
                         .resizable()
                         .scaledToFill()
                         .frame(

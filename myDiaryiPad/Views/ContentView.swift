@@ -13,25 +13,26 @@ import SwiftUI
 
 struct ContentView: View {
     
-    // 後で TimelineViewModel に置き換える
     @State private var vm = TimelineViewModel()
-
-    @State private var selectedPostID: Int?
-    
-    private let samplePosts = Array(1...10)
+    @State private var selectedPostID: Int64?
+    @State private var isShowingEditor = false
     
     var body: some View {
         NavigationSplitView {
             List(selection: $selectedPostID) {
                 Section("Timeline") {
-                    //ForEach(1...10, id: \.self) { postID in
-                    ForEach(samplePosts, id: \.self) { postID in
-                        NavigationLink(value: postID) {
+                    ForEach(vm.posts, id: \.id) { post in
+                        NavigationLink(value: post.id) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Post \(postID)")
-                                    .font(.headline)
+                                Text(
+                                    post.createdAt.formatted(
+                                        date: .abbreviated,
+                                        time: .shortened
+                                    )
+                                )
+                                .font(.headline)
 
-                                Text("This is a sample diary entry.")
+                                Text(post.body)
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                     .lineLimit(2)
@@ -42,11 +43,48 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("myDiary")
-        } detail: {
-            if let selectedPostID {
-                SamplePostDetailView(
-                    postID: selectedPostID
-                )
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        isShowingEditor = true
+                    } label: {
+                        Label("新規投稿", systemImage: "plus")
+                    }
+                }
+            }
+            .sheet(isPresented: $isShowingEditor) {
+                PostEditorView(vm: vm)
+            }
+        }
+        detail: {
+            if let selectedPostID,
+               let post = vm.posts.first(
+                   where: { $0.id == selectedPostID }
+               ) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text(
+                            post.createdAt.formatted(
+                                date: .long,
+                                time: .shortened
+                            )
+                        )
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                        Divider()
+
+                        Text(post.body)
+                            .font(.body)
+                    }
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .leading
+                    )
+                    .padding()
+                }
+                .navigationTitle("Diary")
+                .navigationBarTitleDisplayMode(.inline)
             } else {
                 ContentUnavailableView(
                     "Select a Post",
@@ -57,46 +95,6 @@ struct ContentView: View {
                 )
             }
         }
-    }
-}
-
-private struct SamplePostDetailView: View {
-
-    let postID: Int
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Post \(postID)")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-
-                Text(
-                    Date.now.formatted(
-                        date: .long,
-                        time: .shortened
-                    )
-                )
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-                Divider()
-
-                Text("""
-                This is a temporary diary entry used to verify the iPad layout.
-
-                The real diary data will be connected after the basic NavigationSplitView structure is working.
-                """)
-                .font(.body)
-            }
-            .frame(
-                maxWidth: .infinity,
-                alignment: .leading
-            )
-            .padding()
-        }
-        .navigationTitle("Post \(postID)")
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

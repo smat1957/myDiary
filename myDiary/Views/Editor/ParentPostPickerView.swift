@@ -290,7 +290,11 @@ struct ParentPostPickerView: View {
                                 if !post.images.isEmpty {
 
                                     Label(
-                                        "画像 \(post.images.count)枚",
+                                        //"画像 \(post.images.count)枚",
+                                        String.localizedStringWithFormat(
+                                            String(localized: "images.count"),
+                                            Int64(post.images.count)
+                                        ),
                                         systemImage: "photo"
                                     )
                                     .font(.caption)

@@ -76,7 +76,13 @@ struct PostLinkPickerView: View {
                                 .foregroundStyle(.primary)
 
                             if !post.images.isEmpty {
-                                Text("画像 \(post.images.count) 枚")
+                                //Text("画像 \(post.images.count) 枚")
+                                Text(
+                                    String.localizedStringWithFormat(
+                                        String(localized: "images.count"),
+                                        Int64(post.images.count)
+                                    )
+                                )
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)
                             }

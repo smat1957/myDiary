@@ -10,6 +10,7 @@
 		40494CD8300CBEE400F73148 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 40494CD7300CBEE400F73148 /* Localizable.xcstrings */; };
 		409265FA2FFC44D200DED38A /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 409265F92FFC44D200DED38A /* GRDB */; };
 		40A31693300DFACE00832C36 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 40A31692300DFACE00832C36 /* GRDB */; };
+		40A31813300E4AB700832C36 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 40494CD7300CBEE400F73148 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -92,6 +93,7 @@
 		40A31689300DF5AB00832C36 /* Exceptions for "Models" folder in "myDiaryiPad" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				CachedImageRecord.swift,
 				DiaryImage.swift,
 				DiaryPost.swift,
 				ImageSourceType.swift,
@@ -103,8 +105,26 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DatabaseManager.swift,
+				ImageRecord.swift,
 				Migrations.swift,
+				PostLinkRecord.swift,
+				PostRecord.swift,
 				PostRepository.swift,
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
+		40A317F6300E11D000832C36 /* Exceptions for "Services" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ImageStore.swift,
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
+		40A317F8300E121800832C36 /* Exceptions for "Utilities" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				LinkPreviewHelper.swift,
+				YouTubeHelper.swift,
 			);
 			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
 		};
@@ -164,12 +184,16 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				40A31617300DE4E700832C36 /* Exceptions for "Services" folder in "myDiary" target */,
+				40A317F6300E11D000832C36 /* Exceptions for "Services" folder in "myDiaryiPad" target */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
 		40A315F0300DE4E700832C36 /* Utilities */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				40A317F8300E121800832C36 /* Exceptions for "Utilities" folder in "myDiaryiPad" target */,
+			);
 			path = Utilities;
 			sourceTree = "<group>";
 		};
@@ -386,6 +410,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40A31813300E4AB700832C36 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

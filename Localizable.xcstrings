@@ -64,6 +64,9 @@
         }
       }
     },
+    "Choose a diary entry from the timeline." : {
+
+    },
     "comment.edit.help" : {
       "localizations" : {
         "en" : {
@@ -764,7 +767,13 @@
         }
       }
     },
+    "Select a Post" : {
+
+    },
     "Threaded comments" : {
+
+    },
+    "Timeline" : {
 
     },
     "timeline.delete.message" : {
@@ -1075,6 +1084,9 @@
     "指定した条件に一致する投稿はありません。" : {
 
     },
+    "新規投稿" : {
+
+    },
     "日付指定を解除" : {
 
     },
@@ -1091,12 +1103,6 @@
 
     },
     "検索結果なし" : {
-
-    },
-    "画像 %lld 枚" : {
-
-    },
-    "画像 %lld枚" : {
 
     },
     "紐付ける投稿" : {

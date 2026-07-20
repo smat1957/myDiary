@@ -6,6 +6,14 @@ myDiary stores your diary entirely on your own Mac. Unlike cloud-based diary ser
 
 ![Timeline](docs/images/timeline.png)
 
+| Timeline | Image Viewer |
+|-----------|--------------|
+| ![](docs/images/timeline2.png) | ![](docs/images/imageviewer.png) |
+
+| Search | Editor |
+|--------|--------|
+| ![](docs/images/search.png) | ![](docs/images/editor.png) |
+
 ---
 
 # Why myDiary?
