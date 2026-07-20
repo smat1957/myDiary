@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		40494CD8300CBEE400F73148 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 40494CD7300CBEE400F73148 /* Localizable.xcstrings */; };
 		409265FA2FFC44D200DED38A /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 409265F92FFC44D200DED38A /* GRDB */; };
+		40A31693300DFACE00832C36 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 40A31692300DFACE00832C36 /* GRDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +79,35 @@
 			);
 			target = 4048A2B22FFB271A002619D7 /* myDiary */;
 		};
+		40A31687300DF56D00832C36 /* Exceptions for "ViewModels" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				TimelineNavigationState.swift,
+				TimelineViewModel.swift,
+				"TimelineViewModel+Navigation.swift",
+				"TimelineViewModel+Posts.swift",
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
+		40A31689300DF5AB00832C36 /* Exceptions for "Models" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DiaryImage.swift,
+				DiaryPost.swift,
+				ImageSourceType.swift,
+				PostLink.swift,
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
+		40A3168E300DF75800832C36 /* Exceptions for "Database" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DatabaseManager.swift,
+				Migrations.swift,
+				PostRepository.swift,
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -100,6 +130,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				40A31613300DE4E700832C36 /* Exceptions for "Database" folder in "myDiary" target */,
+				40A3168E300DF75800832C36 /* Exceptions for "Database" folder in "myDiaryiPad" target */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -124,6 +155,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				40A31616300DE4E700832C36 /* Exceptions for "Models" folder in "myDiary" target */,
+				40A31689300DF5AB00832C36 /* Exceptions for "Models" folder in "myDiaryiPad" target */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -145,6 +177,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				40A31618300DE4E700832C36 /* Exceptions for "ViewModels" folder in "myDiary" target */,
+				40A31687300DF56D00832C36 /* Exceptions for "ViewModels" folder in "myDiaryiPad" target */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -164,6 +197,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40A31693300DFACE00832C36 /* GRDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +219,7 @@
 				4048A2B52FFB271A002619D7 /* myDiary */,
 				40A31541300D9DDC00832C36 /* myDiaryiPad */,
 				40A31555300DDC0300832C36 /* myDiaryiPhone */,
+				40A31691300DFACE00832C36 /* Frameworks */,
 				4048A2B42FFB271A002619D7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -211,6 +246,13 @@
 				40A315F9300DE4E700832C36 /* ViewModels */,
 			);
 			path = myDiaryCore;
+			sourceTree = "<group>";
+		};
+		40A31691300DFACE00832C36 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -257,6 +299,7 @@
 			);
 			name = myDiaryiPad;
 			packageProductDependencies = (
+				40A31692300DFACE00832C36 /* GRDB */,
 			);
 			productName = myDiaryiPad;
 			productReference = 40A31540300D9DDC00832C36 /* myDiaryiPad.app */;
@@ -778,6 +821,11 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		409265F92FFC44D200DED38A /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 409265F82FFC44D200DED38A /* XCRemoteSwiftPackageReference "GRDB" */;
+			productName = GRDB;
+		};
+		40A31692300DFACE00832C36 /* GRDB */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 409265F82FFC44D200DED38A /* XCRemoteSwiftPackageReference "GRDB" */;
 			productName = GRDB;
