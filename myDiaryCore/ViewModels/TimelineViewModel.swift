@@ -12,7 +12,9 @@ import Observation
 final class TimelineViewModel {
 
     var posts: [DiaryPost] = []
-
+    
+    let importProgress = ImportProgressState()
+    
     var navigation = TimelineNavigationState()
 
     let repository = PostRepository()

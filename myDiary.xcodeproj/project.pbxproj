@@ -21,6 +21,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		400100D430108B4200E5A5C1 /* Exceptions for "SharedViews" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ProgressDialog.swift,
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
 		40A31613300DE4E700832C36 /* Exceptions for "Database" folder in "myDiary" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -45,6 +52,7 @@
 			membershipExceptions = (
 				DiaryArchive.swift,
 				DiaryImporter.swift,
+				ImportProgressState.swift,
 			);
 			target = 4048A2B22FFB271A002619D7 /* myDiary */;
 		};
@@ -124,13 +132,38 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				LinkPreviewHelper.swift,
+				PostBodyFormatter.swift,
 				YouTubeHelper.swift,
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
+		40D57A92300F2E3500AF2225 /* Exceptions for "Import" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DiaryArchive.swift,
+				DiaryImporter.swift,
+				ImportProgressState.swift,
+			);
+			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
+		};
+		40D57A94300F2E7F00AF2225 /* Exceptions for "Export" folder in "myDiaryiPad" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				DiaryExporter.swift,
 			);
 			target = 40A3153F300D9DDC00832C36 /* myDiaryiPad */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		400100CC30106C6500E5A5C1 /* SharedViews */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				400100D430108B4200E5A5C1 /* Exceptions for "SharedViews" folder in "myDiaryiPad" target */,
+			);
+			path = SharedViews;
+			sourceTree = "<group>";
+		};
 		4048A2B52FFB271A002619D7 /* myDiary */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = myDiary;
@@ -159,6 +192,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				40A31614300DE4E700832C36 /* Exceptions for "Export" folder in "myDiary" target */,
+				40D57A94300F2E7F00AF2225 /* Exceptions for "Export" folder in "myDiaryiPad" target */,
 			);
 			path = Export;
 			sourceTree = "<group>";
@@ -167,6 +201,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				40A31615300DE4E700832C36 /* Exceptions for "Import" folder in "myDiary" target */,
+				40D57A92300F2E3500AF2225 /* Exceptions for "Import" folder in "myDiaryiPad" target */,
 			);
 			path = Import;
 			sourceTree = "<group>";
@@ -268,6 +303,7 @@
 				40A315ED300DE4E700832C36 /* Services */,
 				40A315F0300DE4E700832C36 /* Utilities */,
 				40A315F9300DE4E700832C36 /* ViewModels */,
+				400100CC30106C6500E5A5C1 /* SharedViews */,
 			);
 			path = myDiaryCore;
 			sourceTree = "<group>";
@@ -295,6 +331,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				400100CC30106C6500E5A5C1 /* SharedViews */,
 				4048A2B52FFB271A002619D7 /* myDiary */,
 				40A315F0300DE4E700832C36 /* Utilities */,
 			);
@@ -577,7 +614,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 657FPAGC7T;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -619,7 +656,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 657FPAGC7T;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;

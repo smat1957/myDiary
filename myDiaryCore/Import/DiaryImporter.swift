@@ -20,13 +20,16 @@ final class DiaryImporter {
     
     private let repository: PostRepository
     private let imageStore: ImageStore
-
+    private let progress: ImportProgressState?
+    
     init(
         repository: PostRepository = PostRepository(),
-        imageStore: ImageStore = .shared
+        imageStore: ImageStore = .shared,
+        progress: ImportProgressState? = nil
     ) {
         self.repository = repository
         self.imageStore = imageStore
+        self.progress = progress
     }
 
     /*
@@ -189,323 +192,375 @@ final class DiaryImporter {
         )
     }
     */
-    
+
     func importPackage(
         from packageURL: URL
     ) async throws -> ImportResult {
+                
+        do{
+            let accessing =
+                packageURL.startAccessingSecurityScopedResource()
 
-        let accessing =
-            packageURL.startAccessingSecurityScopedResource()
-
-        defer {
-            if accessing {
-                packageURL.stopAccessingSecurityScopedResource()
+            defer {
+                if accessing {
+                    packageURL.stopAccessingSecurityScopedResource()
+                }
             }
-        }
+                    
+            let jsonURL = packageURL
+                .appendingPathComponent("diary.json")
 
-        let jsonURL = packageURL
-            .appendingPathComponent("diary.json")
-
-        guard FileManager.default.fileExists(
-            atPath: jsonURL.path
-        ) else {
-            throw ImportError.diaryJSONNotFound
-        }
-
-        let archive = try decodeArchive(
-            from: jsonURL
-        )
-
-        guard archive.format == "myDiary" else {
-            throw ImportError.invalidFormat(
-                archive.format
+            guard FileManager.default.fileExists(
+                atPath: jsonURL.path
+            ) else {
+                throw ImportError.diaryJSONNotFound
+            }
+                    
+            let archive = try decodeArchive(
+                from: jsonURL
             )
-        }
 
-        guard archive.version == 1 else {
-            throw ImportError.unsupportedVersion(
-                archive.version
-            )
-        }
+            guard archive.format == "myDiary" else {
+                throw ImportError.invalidFormat(
+                    archive.format
+                )
+            }
+            
+            guard archive.version == 1 else {
+                throw ImportError.unsupportedVersion(
+                    archive.version
+                )
+            }
 
-        let packageRoot = packageURL
-
-        /*
-         Diary Package側の投稿ID
-            ↓
-         SQLite側の投稿ID
-         */
-        var importedPostIDs: [String: Int64] = [:]
-
-        /*
-         投稿間リンクを後から登録するため、
-         SQLite登録後のDiaryPostを保持する。
-         */
-        var insertedPosts: [String: DiaryPost] = [:]
-
-        /*
-         今回、新しく登録した投稿だけを記録する。
-         再Import時に既存投稿のリンクを上書きしないため。
-         */
-        var newlyInsertedPackageIDs: Set<String> = []
-
-        var importedPostCount = 0
-        var skippedPostCount = 0
-
-        var importedMediaCount = 0
-        var skippedMediaCount = 0
-
-        // MARK: - 第1段階
-        // 投稿とメディアを登録する
-
-        for archivePost in archive.posts {
+            let packageRoot = packageURL
+            
+            await MainActor.run {
+                progress?.start(
+                    total: archive.posts.count
+                )
+            }
+            
+            /*
+             Diary Package側の投稿ID
+                ↓
+             SQLite側の投稿ID
+             */
+            var importedPostIDs: [String: Int64] = [:]
 
             /*
-             重複チェックは画像コピーより前に行う。
-             同じpackagePostIDが既にあれば、投稿全体をスキップする。
+             投稿間リンクを後から登録するため、
+             SQLite登録後のDiaryPostを保持する。
              */
-            if let existingPost =
-                try repository.fetchByPackagePostID(
-                    archivePost.id
-                )
-            {
-                importedPostIDs[archivePost.id] =
-                    existingPost.id
+            var insertedPosts: [String: DiaryPost] = [:]
 
-                insertedPosts[archivePost.id] =
-                    existingPost
+            /*
+             今回、新しく登録した投稿だけを記録する。
+             再Import時に既存投稿のリンクを上書きしないため。
+             */
+            var newlyInsertedPackageIDs: Set<String> = []
 
-                skippedPostCount += 1
+            var importedPostCount = 0
+            var skippedPostCount = 0
 
-                print(
-                    "既存投稿をスキップ:",
-                    archivePost.id
-                )
+            var importedMediaCount = 0
+            var skippedMediaCount = 0
 
-                continue
-            }
+            // MARK: - 第1段階
+            // 投稿とメディアを登録する
 
-            var images: [DiaryImage] = []
+            //for archivePost in archive.posts {
+            for (
+                index,
+                archivePost
+            ) in archive.posts.enumerated() {
 
-            let sortedMedia = archivePost.media.sorted {
-                $0.sortOrder < $1.sortOrder
-            }
+                await MainActor.run {
+                    progress?.update(
+                        current: index + 1,
+                        phase: .importingPosts,
+                        //message: String(
+                        //    localized:
+                        //        "import.progress.importingPosts"
+                        //),
+                        detail: archivePost.diaryDate.formatted(
+                            date: .numeric,
+                            time: .shortened
+                        )
+                    )
+                }
+                
+                /*
+                 重複チェックは画像コピーより前に行う。
+                 同じpackagePostIDが既にあれば、投稿全体をスキップする。
+                 */
+                if let existingPost =
+                    try repository.fetchByPackagePostID(
+                        archivePost.id
+                    )
+                {
+                    importedPostIDs[archivePost.id] =
+                        existingPost.id
 
-            for media in sortedMedia {
-                do {
-                    if let image = try await importMedia(
-                        media,
-                        packageRoot: packageRoot,
-                        postDate: archivePost.diaryDate
-                    ) {
-                        images.append(image)
-                        importedMediaCount += 1
-                    } else {
+                    insertedPosts[archivePost.id] =
+                        existingPost
+
+                    skippedPostCount += 1
+
+                    print(
+                        "既存投稿をスキップ:",
+                        archivePost.id
+                    )
+
+                    continue
+                }
+
+                var images: [DiaryImage] = []
+
+                let sortedMedia = archivePost.media.sorted {
+                    $0.sortOrder < $1.sortOrder
+                }
+
+                for media in sortedMedia {
+                    
+                    await MainActor.run {
+                        progress?.update(
+                            current: index + 1,
+                            phase: .copyingMedia,
+                            //message: String(
+                            //    localized:
+                            //        "import.progress.copyingMedia"
+                            //),
+                            detail:
+                                media.path ?? ""
+                        )
+                    }
+                    
+                    do {
+                        if let image = try await importMedia(
+                            media,
+                            packageRoot: packageRoot,
+                            postDate: archivePost.diaryDate
+                        ) {
+                            images.append(image)
+                            importedMediaCount += 1
+                        } else {
+                            skippedMediaCount += 1
+                        }
+
+                    } catch {
+                        print(
+                            "メディアImport失敗:",
+                            media.id,
+                            error.localizedDescription
+                        )
+
                         skippedMediaCount += 1
                     }
-
-                } catch {
-                    print(
-                        "メディアImport失敗:",
-                        media.id,
-                        error.localizedDescription
-                    )
-
-                    skippedMediaCount += 1
                 }
-            }
 
-            let post = DiaryPost(
-                packagePostID: archivePost.id,
-                body: archivePost.body,
-                diaryDate: archivePost.diaryDate,
-                createdAt: archivePost.createdAt,
-                updatedAt: archivePost.updatedAt,
-                images: images,
-                links: []
-            )
+                let post = DiaryPost(
+                    packagePostID: archivePost.id,
+                    body: archivePost.body,
+                    diaryDate: archivePost.diaryDate,
+                    createdAt: archivePost.createdAt,
+                    updatedAt: archivePost.updatedAt,
+                    images: images,
+                    links: []
+                )
 
-            let newPostID = try repository.insert(post)
+                let newPostID = try repository.insert(post)
 
-            let insertedPost = DiaryPost(
-                id: newPostID,
-                packagePostID: archivePost.id,
-                body: archivePost.body,
-                diaryDate: archivePost.diaryDate,
-                createdAt: archivePost.createdAt,
-                updatedAt: archivePost.updatedAt,
-                images: images,
-                links: []
-            )
+                let insertedPost = DiaryPost(
+                    id: newPostID,
+                    packagePostID: archivePost.id,
+                    body: archivePost.body,
+                    diaryDate: archivePost.diaryDate,
+                    createdAt: archivePost.createdAt,
+                    updatedAt: archivePost.updatedAt,
+                    images: images,
+                    links: []
+                )
 
-            importedPostIDs[archivePost.id] =
-                newPostID
+                importedPostIDs[archivePost.id] =
+                    newPostID
 
-            insertedPosts[archivePost.id] =
-                insertedPost
+                insertedPosts[archivePost.id] =
+                    insertedPost
 
-            newlyInsertedPackageIDs.insert(
-                archivePost.id
-            )
-
-            importedPostCount += 1
-        }
-
-        // MARK: - 第2段階
-        
-        // -----------------------------------------------------
-        // コメントの parent_post_id を myDiary内部IDへ変換して保存
-        // -----------------------------------------------------
-
-        var importedParentLinkCount = 0
-
-        for archivePost in archive.posts {
-
-            guard
-                let parentPackagePostID =
-                    archivePost.parentPostID
-            else {
-                continue
-            }
-
-            guard
-                let commentPostID =
-                    importedPostIDs[archivePost.id]
-            else {
-                print(
-                    "コメント投稿IDが見つかりません:",
+                newlyInsertedPackageIDs.insert(
                     archivePost.id
                 )
-                continue
+
+                importedPostCount += 1
             }
 
-            guard
-                let parentPostID =
-                    importedPostIDs[parentPackagePostID]
-            else {
-                print(
-                    "親投稿が見つかりません:",
-                    archivePost.id,
-                    "->",
-                    parentPackagePostID
-                )
-                continue
-            }
+            // MARK: - 第2段階
+            
+            // -----------------------------------------------------
+            // コメントの parent_post_id を myDiary内部IDへ変換して保存
+            // -----------------------------------------------------
 
-            // 自分自身を親にはしない
-            guard commentPostID != parentPostID else {
-                continue
-            }
+            var importedParentLinkCount = 0
 
-            guard
-                var commentPost =
-                    insertedPosts[archivePost.id]
-            else {
-                print(
-                    "コメント投稿を取得できません:",
-                    archivePost.id
-                )
-                continue
-            }
-
-            commentPost.parentPostId =
-                parentPostID
-
-            try repository.update(
-                commentPost
-            )
-
-            insertedPosts[archivePost.id] =
-                commentPost
-
-            importedParentLinkCount += 1
-
-            print(
-                "コメント親投稿を設定:",
-                archivePost.id,
-                "->",
-                parentPackagePostID,
-                "(DB:",
-                commentPostID,
-                "->",
-                parentPostID,
-                ")"
-            )
-        }
-        
-        // 新規登録した投稿だけ、投稿間リンクを復元する
-
-        var importedLinkCount = 0
-
-        for archivePost in archive.posts {
-
-            guard newlyInsertedPackageIDs.contains(
-                archivePost.id
-            ) else {
-                continue
-            }
-
-            guard
-                let sourcePostID =
-                    importedPostIDs[archivePost.id],
-
-                var sourcePost =
-                    insertedPosts[archivePost.id]
-            else {
-                continue
-            }
-
-            let sortedLinks = archivePost.links.sorted {
-                $0.sortOrder < $1.sortOrder
-            }
-
-            var postLinks: [PostLink] = []
-
-            for archiveLink in sortedLinks {
+            for archivePost in archive.posts {
+                
+                guard
+                    let parentPackagePostID =
+                        archivePost.parentPostID
+                else {
+                    continue
+                }
 
                 guard
-                    let targetPostID =
-                        importedPostIDs[archiveLink.target]
+                    let commentPostID =
+                        importedPostIDs[archivePost.id]
                 else {
                     print(
-                        "リンク先投稿が見つかりません:",
-                        archiveLink.target
+                        "コメント投稿IDが見つかりません:",
+                        archivePost.id
                     )
                     continue
                 }
 
-                /*
-                 自分自身へのリンクは登録しない。
-                 */
-                guard sourcePostID != targetPostID else {
+                guard
+                    let parentPostID =
+                        importedPostIDs[parentPackagePostID]
+                else {
+                    print(
+                        "親投稿が見つかりません:",
+                        archivePost.id,
+                        "->",
+                        parentPackagePostID
+                    )
                     continue
                 }
 
-                postLinks.append(
-                    PostLink(
-                        fromPostId: sourcePostID,
-                        toPostId: targetPostID,
-                        sortOrder: postLinks.count
+                // 自分自身を親にはしない
+                guard commentPostID != parentPostID else {
+                    continue
+                }
+
+                guard
+                    var commentPost =
+                        insertedPosts[archivePost.id]
+                else {
+                    print(
+                        "コメント投稿を取得できません:",
+                        archivePost.id
                     )
+                    continue
+                }
+
+                commentPost.parentPostId =
+                    parentPostID
+
+                try repository.update(
+                    commentPost
                 )
 
-                importedLinkCount += 1
-            }
+                insertedPosts[archivePost.id] =
+                    commentPost
 
-            if !postLinks.isEmpty {
-                sourcePost.links = postLinks
-                try repository.update(sourcePost)
+                importedParentLinkCount += 1
+
+                print(
+                    "コメント親投稿を設定:",
+                    archivePost.id,
+                    "->",
+                    parentPackagePostID,
+                    "(DB:",
+                    commentPostID,
+                    "->",
+                    parentPostID,
+                    ")"
+                )
             }
+            
+            // 新規登録した投稿だけ、投稿間リンクを復元する
+
+            var importedLinkCount = 0
+
+            for archivePost in archive.posts {
+
+                guard newlyInsertedPackageIDs.contains(
+                    archivePost.id
+                ) else {
+                    continue
+                }
+
+                guard
+                    let sourcePostID =
+                        importedPostIDs[archivePost.id],
+
+                    var sourcePost =
+                        insertedPosts[archivePost.id]
+                else {
+                    continue
+                }
+
+                let sortedLinks = archivePost.links.sorted {
+                    $0.sortOrder < $1.sortOrder
+                }
+
+                var postLinks: [PostLink] = []
+
+                for archiveLink in sortedLinks {
+
+                    guard
+                        let targetPostID =
+                            importedPostIDs[archiveLink.target]
+                    else {
+                        print(
+                            "リンク先投稿が見つかりません:",
+                            archiveLink.target
+                        )
+                        continue
+                    }
+
+                    /*
+                     自分自身へのリンクは登録しない。
+                     */
+                    guard sourcePostID != targetPostID else {
+                        continue
+                    }
+
+                    postLinks.append(
+                        PostLink(
+                            fromPostId: sourcePostID,
+                            toPostId: targetPostID,
+                            sortOrder: postLinks.count
+                        )
+                    )
+
+                    importedLinkCount += 1
+                }
+
+                if !postLinks.isEmpty {
+                    sourcePost.links = postLinks
+                    try repository.update(sourcePost)
+                }
+            }
+            
+            await MainActor.run {
+                progress?.complete()
+            }
+            
+            return ImportResult(
+                importedPostCount: importedPostCount,
+                skippedPostCount: skippedPostCount,
+                importedMediaCount: importedMediaCount,
+                importedLinkCount: importedLinkCount,
+                skippedMediaCount: skippedMediaCount
+            )
         }
+        catch {
 
-        return ImportResult(
-            importedPostCount: importedPostCount,
-            skippedPostCount: skippedPostCount,
-            importedMediaCount: importedMediaCount,
-            importedLinkCount: importedLinkCount,
-            skippedMediaCount: skippedMediaCount
-        )
-     
+            await MainActor.run {
+                progress?.fail(error)
+            }
+
+            throw error
+        }
     }
     
     
@@ -559,8 +614,10 @@ final class DiaryImporter {
 
         let data = try Data(contentsOf: jsonURL)
 
-        let decoder = JSONDecoder()
+        //print("DEBUG: decodeArchive Start \(data.count) bytes")
 
+        let decoder = JSONDecoder()
+                
         decoder.dateDecodingStrategy = .custom {
             decoder in
 

@@ -1,18 +1,19 @@
 # macOS
 .DS_Store
-merge.sh
 
-# Xcode user-specific files
+# Xcode user-specific files & Build
 xcuserdata/
 *.xcuserstate
-
-# Build products
 build/
 DerivedData/
-
-# Swift Package Manager build cache
 .build/
-
-# Xcode temporary files
 *.xccheckout
 *.xcscmblueprint
+
+# Python / PyCharm / Virtual Environment
+__pycache__/
+*.py[cod]
+*$py.class
+
+.idea/
+.venv/

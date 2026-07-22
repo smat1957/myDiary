@@ -2,12 +2,7 @@
 //  ContentView+DiaryPackage.swift
 //  myDiary
 //
-//  Created by 的池秋成 on 2026/07/16.
-//
-
-//
-//  ContentView+DiaryPackage.swift
-//  myDiary
+//  Created by 的池秋成 on 2026/07/21.
 //
 
 import SwiftUI
@@ -19,8 +14,11 @@ extension ContentView {
     func importPackage(
         from packageURL: URL
     ) {
+        
+        //print("DEBUG:Import start")
+        //print(packageURL.path)
+        
         Task {
-
             do {
                 //let importer = DiaryImporter()
                 let importer = DiaryImporter(
@@ -33,8 +31,9 @@ extension ContentView {
                     )
 
                 await MainActor.run {
+                    //print("DEBUG:",importResult.importedPostCount)
+                    
                     vm.loadPosts()
-
                     importMessage = """
                     Diary Packageの読み込みが完了しました。
 

@@ -423,6 +423,65 @@ final class ImageStore {
 
     struct ExportedImagePaths {
         let path: String
+        let displayPath: String?
+        let thumbnailPath: String?
+    }
+
+    func exportImage(
+        _ image: DiaryImage,
+        to packageRoot: URL
+    ) throws -> ExportedImagePaths {
+
+        let sourceOriginalURL = url(
+            for: image,
+            kind: .original
+        )
+
+        let packageFolderName: String
+
+        switch image.sourceType {
+        case .photo:
+            packageFolderName = "photos"
+
+        case .link:
+            packageFolderName = "links"
+
+        case .youtube:
+            packageFolderName = "youtube"
+
+        case .generated:
+            packageFolderName = "generated"
+        }
+
+        let relativePath =
+            "pictures/\(packageFolderName)/"
+            + image.baseName
+            + "."
+            + image.originalExtension
+
+        let destinationURL =
+            packageRoot.appendingPathComponent(
+                relativePath
+            )
+
+        try ensureParentDirectory(
+            of: destinationURL
+        )
+
+        try copyReplacingExisting(
+            from: sourceOriginalURL,
+            to: destinationURL
+        )
+
+        return ExportedImagePaths(
+            path: relativePath,
+            displayPath: nil,
+            thumbnailPath: nil
+        )
+    }
+    /*
+    struct ExportedImagePaths {
+        let path: String
         let displayPath: String
         let thumbnailPath: String
     }
@@ -516,7 +575,7 @@ final class ImageStore {
             thumbnailPath: relativeThumbnailPath
         )
     }
-
+*/
     private func copyReplacingExisting(
         from sourceURL: URL,
         to destinationURL: URL

@@ -228,6 +228,24 @@
     "Diary" : {
 
     },
+    "Diary Package" : {
+
+    },
+    "Diary Packageを書き出す" : {
+
+    },
+    "Diary Packageを読み込む" : {
+
+    },
+    "Diary Packageを読み込んでいます" : {
+
+    },
+    "Diary Package書き出し" : {
+
+    },
+    "Diary Package読み込み" : {
+
+    },
     "editor.body" : {
       "localizations" : {
         "en" : {

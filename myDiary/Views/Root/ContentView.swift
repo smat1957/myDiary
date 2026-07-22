@@ -197,6 +197,15 @@ struct ContentView: View {
             }
         }
         .sheet(
+            isPresented: importProgressPresented
+        ) {
+            ProgressDialog(
+                title: "Diary Packageを読み込んでいます",
+                progress: vm.importProgress
+            )
+            .interactiveDismissDisabled()
+        }
+        .sheet(
             isPresented: $showingSearch
         ) {
             PostSearchView(
@@ -300,5 +309,15 @@ struct ContentView: View {
             Text(exportMessage ?? "")
         }
     }
-
+    
+    private var importProgressPresented: Binding<Bool> {
+        Binding(
+            get: {
+                vm.importProgress.isRunning
+            },
+            set: { _ in
+                // Import中は利用者によるシート閉鎖を許可しない
+            }
+        )
+    }
 }

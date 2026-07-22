@@ -326,7 +326,8 @@ struct ImageGridView: View {
         )
         .clipped()
     }
-
+    
+    /*
     // MARK: - Media cell
 
     @ViewBuilder
@@ -427,7 +428,121 @@ struct ImageGridView: View {
                 )
         }
     }
+     */
+    // MARK: - Media cell
 
+    @ViewBuilder
+    private func mediaCell(
+        _ image: DiaryImage,
+        width: CGFloat,
+        height: CGFloat,
+        remainingCount: Int? = nil
+    ) -> some View {
+
+        let url = ImageStore.shared.url(
+            for: image,
+            kind: .thumbnail
+        )
+
+        if let uiImage = UIImage(
+            contentsOfFile: url.path
+        ) {
+            ZStack(alignment: .topLeading) {
+
+                /*
+                 画像本体を押した場合は、
+                 sourceTypeに関係なくImageViewerを開く。
+                 */
+                Button {
+                    onTapImage(image)
+                } label: {
+                    ZStack {
+
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(
+                                width: width,
+                                height: height
+                            )
+                            .clipped()
+
+                        /*
+                         5枚以上ある場合の「+N」表示。
+
+                         このオーバーレイも画像本体Buttonの中に
+                         あるため、押すとImageViewerが開く。
+                         */
+                        if let remainingCount,
+                           remainingCount > 0 {
+
+                            Color.black
+                                .opacity(0.45)
+
+                            Text("+\(remainingCount)")
+                                .font(
+                                    .system(
+                                        size: 42,
+                                        weight: .bold
+                                    )
+                                )
+                                .foregroundStyle(.white)
+                        }
+                    }
+                    .frame(
+                        width: width,
+                        height: height
+                    )
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .frame(
+                    width: width,
+                    height: height
+                )
+
+                /*
+                 左上のリンクボタンと、
+                 右上の削除ボタンは画像Buttonの外側へ置く。
+                 */
+                HStack {
+                    sourceButton(for: image)
+                        .zIndex(2)
+
+                    Spacer()
+
+                    if allowsDeletion {
+                        deleteButton(for: image)
+                            .zIndex(2)
+                    }
+                }
+                .frame(width: width)
+            }
+            .frame(
+                width: width,
+                height: height
+            )
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: 8
+                )
+            )
+
+        } else {
+            Text(
+                String(
+                    localized: "image.loadFailed"
+                )
+            )
+            .frame(
+                width: width,
+                height: height
+            )
+            .background(
+                .gray.opacity(0.2)
+            )
+        }
+    }
     // MARK: - Source button
 
     @ViewBuilder

@@ -34,6 +34,8 @@ final class DatabaseManager {
             let dbURL =
                 diaryFolder.appendingPathComponent("diary.sqlite")
             
+            print("DEBUG:",dbURL)
+            
             dbQueue = try DatabaseQueue(path: dbURL.path)
 
             try Migrations.migrate(dbQueue)

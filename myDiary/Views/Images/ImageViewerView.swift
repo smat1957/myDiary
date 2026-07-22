@@ -193,44 +193,22 @@ struct ImageViewerView: View {
              Display / Original
              プルダウンメニュー
              */
-            /*
-            Picker(
-                //"表示画像",
-                String(localized: "viewer.imageKind"),
-                selection:
-                    Bindable(state)
-                        .viewerImageKind
-            ) {
-                ForEach(
-                    ViewerImageKind
-                        .allCases
-                ) { kind in
-                    Text(kind.rawValue)
-                        .tag(kind)
-                }
-            }
-             */
-            Picker(
-                String(localized: "viewer.imageKind"),
-                selection: Bindable(state).viewerImageKind
-            ) {
-                Picker(
-                    String(localized: "viewer.imageKind"),
-                    selection: Bindable(state).viewerImageKind
-                ) {
-                    ForEach(ViewerImageKind.allCases) { kind in
-                        Text(kind.localizedName)
-                            .tag(kind)
-                    }
-                }
-            }
-            .pickerStyle(.menu)
-            .labelsHidden()
-            .frame(width: 110)
-            .help(
-                String(localized: "viewer.imageKind.help")
-                //"Display画像またはOriginal画像を表示"
-            )
+
+             Picker(
+                 String(localized: "viewer.imageKind"),
+                 selection: Bindable(state).viewerImageKind
+             ) {
+                 ForEach(ViewerImageKind.allCases) { kind in
+                     Text(kind.localizedName)
+                         .tag(kind)
+                 }
+             }
+             .pickerStyle(.menu)
+             .labelsHidden()
+             .frame(width: 110)
+             .help(
+                 String(localized: "viewer.imageKind.help")
+             )
 
             Spacer()
 
